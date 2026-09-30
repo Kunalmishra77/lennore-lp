@@ -1,0 +1,101 @@
+---
+import '../styles/global.css';
+import '../styles/motion.css';
+import favicon32 from '../assets/brand/favicon-32.png';
+import ogSource from '../assets/images/hero/HERO_desktop.jpg';
+import { getImage } from 'astro:assets';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Path of the canonical page, e.g. "/" (variants point to "/"). */
+  canonicalPath?: string;
+  robots?: 'index, follow' | 'noindex, follow' | 'noindex, nofollow';
+  lang?: string;
+  variantId?: string;
+}
+
+const {
+  title,
+  description,
+  canonicalPath = Astro.url.pathname,
+  robots = 'index, follow',
+  lang = 'en-IN',
+  variantId = 'default',
+} = Astro.props;
+
+const site = Astro.site ?? new URL('https://go.lennore.in');
+const canonical = new URL(canonicalPath, site).href;
+// Interim OG image generated from the hero still; a designed 1200×630 card (with logo) replaces it later.
+const og = await getImage({ src: ogSource, width: 1200, height: 630, fit: 'cover', format: 'jpg', quality: 78 });
+const ogUrl = new URL(og.src, site).href;
+---
+
+<!doctype html>
+<html lang={lang} data-variant={variantId}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <script is:inline>
+      // Motion flag only (no render-blocking work). Initial hidden states in motion.css apply under .js-motion.
+      (function (d) {
+        var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        d.classList.add(reduce ? 'reduced-motion' : 'js-motion');
+      })(document.documentElement);
+    </script>
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#07100C" />
+    <meta name="format-detection" content="telephone=no" />
+
+    <link rel="preload" href="/fonts/sora-600.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin />
+    <slot name="head" />
+
+    <link rel="icon" type="image/png" sizes="32x32" href={favicon32.src} />
+    <link rel="icon" type="image/png" sizes="512x512" href="/icons/favicon-512.png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Lennore" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={lang.replace('-', '_')} />
+    <meta name="twitter:card" content="summary_large_image" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <slot name="header" />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <slot name="footer" />
+    <slot name="overlay" />
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    left: 16px;
+    top: -100px;
+    z-index: 100;
+    padding: 12px 16px;
+    border-radius: 12px;
+    background: var(--color-ion-green);
+    color: var(--color-ink-1);
+    font-weight: 600;
+  }
+  .skip-link:focus {
+    top: 16px;
+  }
+  main:focus {
+    outline: none;
+  }
+</style>

@@ -1,0 +1,42 @@
+---
+/**
+ * Dev-only marker for content that is hidden because the fact is missing from content/product.json.
+ * Renders nothing in production builds.
+ */
+interface Props {
+  /** Dotted key in product.json (or a short description of the missing input). */
+  k: string;
+  /** Render as a block (own line) instead of inline. */
+  block?: boolean;
+}
+const { k, block = false } = Astro.props;
+const dev = import.meta.env.DEV;
+---
+
+{
+  dev && (
+    <span class:list={['dev-missing', { 'dev-missing--block': block }]} data-missing={k}>
+      [MISSING: {k}]
+    </span>
+  )
+}
+
+<style>
+  .dev-missing {
+    display: inline-block;
+    margin: 2px 4px 2px 0;
+    padding: 2px 8px;
+    border: 1px dashed #f07167;
+    border-radius: 6px;
+    background: rgb(240 113 103 / 0.12);
+    color: #f07167;
+    font: 600 12px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+  .dev-missing--block {
+    display: block;
+    width: fit-content;
+    margin-block: 8px;
+  }
+</style>

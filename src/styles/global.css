@@ -1,0 +1,282 @@
+@import 'tailwindcss';
+
+/* ---------------------------------------------------------------------------
+   Fonts — self-hosted, Latin subset (Sora 600 + Inter variable are preloaded).
+   Fallback faces are metric-matched to Arial (computed from the font files) so
+   the swap does not shift layout.
+--------------------------------------------------------------------------- */
+@font-face {
+  font-family: 'Sora';
+  src: url('/fonts/sora-600.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter-var.woff2') format('woff2');
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Sora Fallback';
+  src: local('Arial');
+  size-adjust: 112.59%;
+  ascent-override: 86.15%;
+  descent-override: 25.76%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('Arial');
+  size-adjust: 104.33%;
+  ascent-override: 92.85%;
+  descent-override: 23.12%;
+  line-gap-override: 0%;
+}
+/* Mukta is only referenced by the Hindi variant (lang="hi"). */
+@font-face {
+  font-family: 'Mukta';
+  src: url('/fonts/mukta-400-deva.woff2') format('woff2');
+  font-weight: 400;
+  font-display: swap;
+  unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF;
+}
+@font-face {
+  font-family: 'Mukta';
+  src: url('/fonts/mukta-600-deva.woff2') format('woff2');
+  font-weight: 600;
+  font-display: swap;
+  unicode-range: U+0900-097F, U+1CD0-1CF9, U+200C-200D, U+20A8, U+20B9, U+25CC, U+A830-A839, U+A8E0-A8FF;
+}
+
+/* ---------------------------------------------------------------------------
+   Tokens — mirrored from design/tokens.json (keep in sync).
+--------------------------------------------------------------------------- */
+@theme {
+  --color-*: initial;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-white: #fff;
+
+  --color-ink-0: #050807;
+  --color-ink-1: #07100c;
+  --color-ink-2: #0d1a14;
+  --color-ink-3: #14261d;
+
+  --color-clear-0: #f4f7f3;
+  --color-clear-1: #e8eee8;
+  --color-clear-2: #d5ded6;
+
+  --color-ion-green: #7fd6a4;
+  --color-ion-aqua: #9fe8e1;
+  --color-ion-green-on-light: #1f7a4d;
+  --color-acid-amber: #e0b35a;
+
+  --color-on-ink: #f2f5f1;
+  --color-on-ink-2: #a9b5ad;
+  --color-on-ink-muted: #74827a;
+  --color-on-clear: #0b1410;
+  --color-on-clear-2: #3f4d45;
+  --color-on-clear-muted: #66736b;
+
+  --color-brand-teal-deep: #154d4f;
+  --color-brand-teal: #256265;
+  --color-brand-gold: #e9b449;
+  --color-brand-grey: #c4c7c6;
+
+  --color-ph-acid-strong: #e07a5a;
+  --color-ph-acid-mild: #e0b35a;
+  --color-ph-neutral: #cfe3c2;
+  --color-ph-alk-mild: #6fcfa0;
+  --color-ph-alk-strong: #5b8def;
+
+  --color-error: #f07167;
+  --color-success: #7fd6a4;
+  --color-focus: #9fe8e1;
+
+  --font-display: 'Sora', 'Sora Fallback', system-ui, sans-serif;
+  --font-body: 'Inter', 'Inter Fallback', system-ui, sans-serif;
+  --font-deva: 'Mukta', 'Noto Sans Devanagari', sans-serif;
+
+  --text-display: clamp(40px, 7vw, 96px);
+  --text-display--line-height: 1.05;
+  --text-display--letter-spacing: -0.02em;
+  --text-h2: clamp(30px, 4.5vw, 56px);
+  --text-h2--line-height: 1.1;
+  --text-h2--letter-spacing: -0.015em;
+  --text-h3: clamp(20px, 2.2vw, 28px);
+  --text-h3--line-height: 1.2;
+  --text-overlay: clamp(22px, 3vw, 36px);
+  --text-overlay--line-height: 1.2;
+  --text-body-l: 18px;
+  --text-body-l--line-height: 1.55;
+  --text-body: 16px;
+  --text-body--line-height: 1.55;
+  --text-small: 13px;
+  --text-small--line-height: 1.5;
+  --text-eyebrow: 13px;
+  --text-eyebrow--letter-spacing: 0.12em;
+
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-pill: 999px;
+
+  --breakpoint-sm: 480px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+
+  --container-page: 1200px;
+  --spacing-section: clamp(80px, 12vw, 160px);
+  --spacing-gutter: 16px;
+
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --z-overlay: 10;
+  --z-header: 50;
+  --z-sticky-bar: 60;
+  --z-sheet: 80;
+  --z-consent: 90;
+}
+
+/* ---------------------------------------------------------------------------
+   Theme scopes: sections declare data-theme="ink" | "clear"; components read the
+   semantic variables below instead of raw colours.
+--------------------------------------------------------------------------- */
+:root,
+[data-theme='ink'] {
+  --bg: var(--color-ink-1);
+  --surface: var(--color-ink-2);
+  --line: color-mix(in oklab, var(--color-on-ink) 14%, transparent);
+  --fg: var(--color-on-ink);
+  --fg-2: var(--color-on-ink-2);
+  --fg-muted: var(--color-on-ink-muted);
+  --accent: var(--color-ion-green);
+  --cta-bg: var(--color-ion-green);
+  --cta-fg: var(--color-ink-1);
+  --heading: var(--color-on-ink);
+  color-scheme: dark;
+}
+[data-theme='clear'] {
+  --bg: var(--color-clear-0);
+  --surface: var(--color-clear-1);
+  --line: var(--color-clear-2);
+  --fg: var(--color-on-clear);
+  --fg-2: var(--color-on-clear-2);
+  --fg-muted: var(--color-on-clear-muted);
+  --accent: var(--color-ion-green-on-light);
+  --cta-bg: var(--color-brand-teal-deep);
+  --cta-fg: var(--color-clear-0);
+  --heading: var(--color-brand-teal-deep);
+  color-scheme: light;
+}
+[data-theme] {
+  background-color: var(--bg);
+  color: var(--fg);
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+    scroll-padding-top: 88px;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  body {
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    line-height: 1.55;
+    background: var(--color-ink-1);
+    color: var(--fg);
+    -webkit-font-smoothing: antialiased;
+  }
+  /* Reserve room for the fixed mobile action bar so it never covers the footer. */
+  @media (max-width: 767px) {
+    body {
+      padding-bottom: calc(64px + env(safe-area-inset-bottom));
+    }
+  }
+  :lang(hi) body,
+  body:lang(hi) {
+    font-family: var(--font-deva);
+  }
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: var(--heading);
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+  [data-theme='clear'] :focus-visible {
+    outline-color: var(--color-brand-teal-deep);
+  }
+  img,
+  video,
+  svg {
+    max-width: 100%;
+  }
+}
+
+@layer components {
+  .container-page {
+    width: 100%;
+    max-width: calc(var(--container-page) + 2 * var(--spacing-gutter));
+    margin-inline: auto;
+    padding-inline: var(--spacing-gutter);
+  }
+  @media (min-width: 768px) {
+    .container-page {
+      max-width: calc(var(--container-page) + 64px);
+      padding-inline: 32px;
+    }
+  }
+  .section-y {
+    padding-block: var(--spacing-section);
+  }
+  .eyebrow {
+    font-size: var(--text-eyebrow);
+    letter-spacing: var(--text-eyebrow--letter-spacing);
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .h2 {
+    font-size: var(--text-h2);
+    line-height: var(--text-h2--line-height);
+    letter-spacing: var(--text-h2--letter-spacing);
+  }
+  .h3 {
+    font-size: var(--text-h3);
+    line-height: var(--text-h3--line-height);
+  }
+  .lede {
+    font-size: var(--text-body-l);
+    line-height: var(--text-body-l--line-height);
+    color: var(--fg-2);
+  }
+  .sr-only-focusable:not(:focus) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}

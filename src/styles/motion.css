@@ -1,0 +1,17 @@
+/*
+ * Motion base rules.
+ * - Content is fully visible by default (no-JS users see everything).
+ * - Hidden initial states for scroll reveals are added ONLY under html.js-motion (Phase 7).
+ * - html.reduced-motion: no scrubbing, pinning or parallax; fades ≤ 200 ms.
+ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

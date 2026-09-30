@@ -1,0 +1,7 @@
+# Ad-review crawlers (AdsBot-Google, facebookexternalhit) must be able to reach the page.
+User-agent: *
+Allow: /
+Disallow: /thank-you
+Disallow: /api/
+
+Sitemap: https://go.lennore.in/sitemap-index.xml

@@ -1,0 +1,446 @@
+{
+  "_readme": "Single source of truth for all product facts. Every value must come from Lennore's official spec sheet/manual/test report. Use null for unknown — components hide null items in production. Fill 'source' with document name + page.",
+  "_status": "PARTIAL — 4 models identified from product photos (L9, L5, L5+RO, L7+RO). L9 pH levels/controls/ports filled from photos. All other specs, prices, warranty, service, contact still needed from client.",
+  "company": {
+    "legalName": "Lennore India Private Limited",
+    "brand": "Lennore",
+    "website": "https://lennore.in",
+    "email": "info@lennore.in",
+    "phone": null,
+    "whatsapp": null,
+    "registeredAddress": null,
+    "cin": "U46590DL2024PTC429033",
+    "supportHours": null,
+    "social": {
+      "instagram": null,
+      "facebook": null,
+      "youtube": null,
+      "pinterest": "https://in.pinterest.com/lennore_offical/"
+    },
+    "source": "Public company record; lennore.in homepage (indexed)",
+    "logo": {
+      "full": "assets/brand/logo-full.png",
+      "horizontal": "assets/brand/logo-horizontal.png",
+      "horizontalWhite": "assets/brand/logo-horizontal-white.png",
+      "mark": "assets/brand/logo-mark.png",
+      "markOnDark": "assets/brand/logo-mark-ondark.png",
+      "favicon": "assets/brand/favicon-512.png"
+    },
+    "officialTagline": "Alkaline Water Ionizer · Hydrogen Water Generator",
+    "taglineNote": "From the official logo lockup. 'Hydrogen Water Generator' may be used as a product descriptor only — never attach a health benefit to hydrogen (docs/11)."
+  },
+  "service": {
+    "demoCities": [],
+    "servicePincodePrefixes": [],
+    "demoDurationMinutes": null,
+    "installationBy": null,
+    "installationLeadTimeDays": null,
+    "responseSlaHours": null,
+    "source": null
+  },
+  "models": [
+    {
+      "id": "l9",
+      "name": "Lennore L9 Lionizer",
+      "isHero": true,
+      "plates": null,
+      "plateMaterial": null,
+      "electrolysisPower": null,
+      "phLevels": [
+        {
+          "id": "neutral",
+          "label": "Neutral Water",
+          "ph": "7",
+          "stream": "neutral",
+          "recommendedUse": null,
+          "drinkable": null,
+          "reagentColor": null
+        },
+        {
+          "id": "alk-low",
+          "label": "Low Alkaline",
+          "ph": "7.5",
+          "stream": "alkaline",
+          "recommendedUse": null,
+          "drinkable": null,
+          "reagentColor": null
+        },
+        {
+          "id": "alk-med",
+          "label": "Medium Alkaline",
+          "ph": "8.5",
+          "stream": "alkaline",
+          "recommendedUse": null,
+          "drinkable": null,
+          "reagentColor": null
+        },
+        {
+          "id": "alk-high",
+          "label": "High Alkaline",
+          "ph": "9.5",
+          "stream": "alkaline",
+          "recommendedUse": null,
+          "drinkable": null,
+          "reagentColor": null
+        },
+        {
+          "id": "alk-ultra",
+          "label": "Ultra High Alkaline",
+          "ph": "10.5",
+          "stream": "alkaline",
+          "recommendedUse": null,
+          "drinkable": null,
+          "reagentColor": null
+        },
+        {
+          "id": "acid-low",
+          "label": "Low Acidic",
+          "ph": "6.5",
+          "stream": "acidic",
+          "recommendedUse": null,
+          "drinkable": null,
+          "reagentColor": null
+        },
+        {
+          "id": "acid-med",
+          "label": "Medium Acidic",
+          "ph": "5.5",
+          "stream": "acidic",
+          "recommendedUse": null,
+          "drinkable": null,
+          "reagentColor": null
+        },
+        {
+          "id": "acid-high",
+          "label": "High Acidic",
+          "ph": "4.5",
+          "stream": "acidic",
+          "recommendedUse": null,
+          "drinkable": null,
+          "reagentColor": null
+        },
+        {
+          "id": "acid-ultra",
+          "label": "Ultra High Acidic",
+          "ph": "3.5",
+          "stream": "acidic",
+          "recommendedUse": null,
+          "drinkable": null,
+          "reagentColor": null
+        }
+      ],
+      "phLevelsSource": "Read from the L9 front control panel in real product photos (paired buttons: 7.5/6.5, 8.5/5.5, 9.5/4.5, 10.5/3.5; Neutral pH 7). recommendedUse and drinkable MUST come from the user manual — keep null until then.",
+      "orpRange": null,
+      "filter": {
+        "type": null,
+        "stages": null,
+        "lifeLitres": null,
+        "lifeMonthsTypical": null,
+        "indicator": null,
+        "replacementPrice": null,
+        "claims": [],
+        "testReportUrl": null
+      },
+      "autoClean": true,
+      "autoCleanSource": "'Auto Clean' button on front panel + 'Ionizer Cleaning' port on side (product photos)",
+      "display": "Colour screen with mode tiles (Alkaline 1/2/3, Purified Water, Beauty Water, High Acidic) and readouts for TDS, litres and tank status — as seen in product photos; confirm with manual",
+      "displayNote": "'Beauty Water' is an on-screen mode label only — do not turn it into a skin/health claim in copy.",
+      "sidePorts": [
+        "Power Cable",
+        "Acidic Out",
+        "Water In",
+        "Ionizer Cleaning"
+      ],
+      "controls": [
+        "4 paired alkaline/acidic level buttons",
+        "Neutral Water pH 7",
+        "OFF",
+        "Auto Clean"
+      ],
+      "spout": "Flexible stainless-steel spout on top",
+      "flowRateLpm": null,
+      "inletPressure": null,
+      "powerSupply": null,
+      "powerConsumption": null,
+      "dimensionsMm": null,
+      "weightKg": null,
+      "installation": [
+        "countertop",
+        "under-counter",
+        "wall-mounted"
+      ],
+      "installationSource": "lennore.in homepage states countertop, UTC (under-the-counter) or wall-mounted installation — confirm per model",
+      "features": [
+        {
+          "id": "f1",
+          "title": null,
+          "body": null,
+          "spec": null,
+          "hotspot": {
+            "desktop": null,
+            "mobile": null
+          }
+        }
+      ],
+      "priceFrom": null,
+      "priceInclusions": [],
+      "emi": null,
+      "warranty": {
+        "machine": null,
+        "plates": null,
+        "filter": null,
+        "termsUrl": null
+      },
+      "certifications": [],
+      "countryOfOrigin": null,
+      "media": {
+        "heroStill": {
+          "desktop": "assets/images/hero/HERO_desktop.jpg",
+          "mobile": "assets/images/hero/HERO_mobile.jpg"
+        },
+        "cutouts": [
+          "assets/images/product/CUT_front.webp",
+          "assets/images/product/CUT_side_right.webp",
+          "assets/images/product/CUT_side_left.webp"
+        ],
+        "revealSequence": null,
+        "cutawaySequence": null,
+        "heroVideo": {
+          "desktop": "assets/videos/VIDEO_hero_desktop.mp4",
+          "mobile": "assets/videos/VIDEO_hero_mobile.mp4"
+        },
+        "revealStills": {
+          "desktop": [
+            "assets/images/hero/HERO_desktop.jpg",
+            "assets/images/product/KEY_side_right_desktop.jpg",
+            "assets/images/closeup/KEY_display_desktop.jpg"
+          ],
+          "mobile": [
+            "assets/images/hero/HERO_mobile.jpg",
+            "assets/images/product/KEY_side_right_mobile.jpg",
+            "assets/images/closeup/KEY_display_mobile.jpg"
+          ]
+        },
+        "lightTheme": [
+          "assets/images/light/PRODUCT_light_front.jpg",
+          "assets/images/light/PRODUCT_light_side_right.jpg",
+          "assets/images/light/PRODUCT_light_side_left.jpg"
+        ],
+        "dropVideo": "assets/videos/VIDEO_drop.mp4",
+        "streamVideo": "assets/videos/VIDEO_stream.mp4",
+        "card": "assets/images/models/CARD_L9.jpg",
+        "photos": [
+          "assets/images/photos/L9/L9_front_color-screen.jpg",
+          "assets/images/photos/L9/L9_side-right_color-screen.jpg",
+          "assets/images/photos/L9/L9_side-left_color-screen.jpg",
+          "assets/images/photos/L9/L9_front_lcd-screen.jpg",
+          "assets/images/photos/L9/L9_side-right_lcd-screen.jpg",
+          "assets/images/photos/L9/L9_side-left_lcd-screen.jpg"
+        ],
+        "cutoutLcd": "assets/images/product/CUT_L9_front_lcd.webp",
+        "lifestyle": [
+          "assets/images/lifestyle/AI_LIFE_L9_countertop.jpg",
+          "assets/images/lifestyle/AI_LIFE_L9_wallmount.jpg"
+        ]
+      },
+      "source": null,
+      "displayVariants": [
+        "colour touch screen (photos TNF09462/69/65)",
+        "blue LCD screen (photos B-SET-02/03/04)"
+      ],
+      "displayVariantsNote": "Two L9 front-panel versions exist in the photo set. CONFIRM with client which one is currently sold before using both on the page."
+    },
+    {
+      "plates": null,
+      "plateMaterial": null,
+      "electrolysisPower": null,
+      "orpRange": null,
+      "autoClean": null,
+      "display": null,
+      "flowRateLpm": null,
+      "inletPressure": null,
+      "powerSupply": null,
+      "powerConsumption": null,
+      "dimensionsMm": null,
+      "weightKg": null,
+      "priceFrom": null,
+      "emi": null,
+      "countryOfOrigin": null,
+      "source": null,
+      "id": "l5",
+      "name": "Lennore L5 Lionizer",
+      "isHero": false,
+      "phLevels": [],
+      "filter": {
+        "type": null,
+        "stages": null,
+        "lifeLitres": null,
+        "lifeMonthsTypical": null,
+        "indicator": null,
+        "replacementPrice": null,
+        "claims": [],
+        "testReportUrl": null
+      },
+      "installation": [],
+      "features": [],
+      "priceInclusions": [],
+      "warranty": {
+        "machine": null,
+        "plates": null,
+        "filter": null,
+        "termsUrl": null
+      },
+      "certifications": [],
+      "observedFromPhotos": [
+        "Compact upright body",
+        "Small colour screen with the same mode tiles as L9",
+        "Single red button below screen",
+        "Flexible spout on the front-left",
+        "Countertop use shown in lifestyle photo"
+      ],
+      "media": {
+        "cutout": "assets/images/product/CUT_L5_front.webp",
+        "card": "assets/images/models/CARD_L5.jpg",
+        "photos": [
+          "assets/images/photos/L5/L5_front.jpg"
+        ],
+        "lifestyle": [
+          "assets/images/lifestyle/LIFE_L5_model-with-glass.jpg"
+        ]
+      }
+    },
+    {
+      "plates": null,
+      "plateMaterial": null,
+      "electrolysisPower": null,
+      "orpRange": null,
+      "autoClean": null,
+      "display": null,
+      "flowRateLpm": null,
+      "inletPressure": null,
+      "powerSupply": null,
+      "powerConsumption": null,
+      "dimensionsMm": null,
+      "weightKg": null,
+      "priceFrom": null,
+      "emi": null,
+      "countryOfOrigin": null,
+      "source": null,
+      "id": "l5-ro",
+      "name": "Lennore L5+RO Lionizer",
+      "isHero": false,
+      "phLevels": [],
+      "filter": {
+        "type": null,
+        "stages": null,
+        "lifeLitres": null,
+        "lifeMonthsTypical": null,
+        "indicator": null,
+        "replacementPrice": null,
+        "claims": [],
+        "testReportUrl": null
+      },
+      "installation": [],
+      "features": [],
+      "priceInclusions": [],
+      "warranty": {
+        "machine": null,
+        "plates": null,
+        "filter": null,
+        "termsUrl": null
+      },
+      "certifications": [],
+      "observedFromPhotos": [
+        "Ionizer and RO in one unit (per 'L5+RO' label on the front)",
+        "Front dispenser with a colour screen",
+        "Countertop and under-sink installation shown in photos"
+      ],
+      "media": {
+        "photos": [],
+        "lifestyle": [
+          "assets/images/lifestyle/LIFE_L5-RO_countertop.jpg",
+          "assets/images/lifestyle/LIFE_RO_undersink.jpg"
+        ]
+      }
+    },
+    {
+      "plates": null,
+      "plateMaterial": null,
+      "electrolysisPower": null,
+      "orpRange": null,
+      "autoClean": null,
+      "display": null,
+      "flowRateLpm": null,
+      "inletPressure": null,
+      "powerSupply": null,
+      "powerConsumption": null,
+      "dimensionsMm": null,
+      "weightKg": null,
+      "priceFrom": null,
+      "emi": null,
+      "countryOfOrigin": null,
+      "source": null,
+      "id": "l7-ro",
+      "name": "Lennore L7+RO Lionizer",
+      "isHero": false,
+      "phLevels": [],
+      "filter": {
+        "type": null,
+        "stages": null,
+        "lifeLitres": null,
+        "lifeMonthsTypical": null,
+        "indicator": null,
+        "replacementPrice": null,
+        "claims": [],
+        "testReportUrl": null
+      },
+      "installation": [],
+      "features": [],
+      "priceInclusions": [],
+      "warranty": {
+        "machine": null,
+        "plates": null,
+        "filter": null,
+        "termsUrl": null
+      },
+      "certifications": [],
+      "observedFromPhotos": [
+        "Ionizer and RO in one unit (per 'L7+RO' label)",
+        "Black body with a teal wave front panel",
+        "Front dispenser with a colour screen",
+        "Top flexible spout",
+        "Countertop and under-sink installation shown"
+      ],
+      "media": {
+        "cutouts": [
+          "assets/images/product/CUT_L7-RO_front-right.webp",
+          "assets/images/product/CUT_L7-RO_front-left.webp"
+        ],
+        "card": "assets/images/models/CARD_L7-RO.jpg",
+        "photos": [
+          "assets/images/photos/L7-RO/L7-RO_front-right.jpg",
+          "assets/images/photos/L7-RO/L7-RO_front-left.jpg",
+          "assets/images/photos/L7-RO/RO-unit_back.jpg",
+          "assets/images/photos/L7-RO/RO-unit_back-left.jpg",
+          "assets/images/photos/L7-RO/RO-unit_back-right.jpg",
+          "assets/images/photos/L7-RO/RO-unit_top.jpg"
+        ],
+        "lifestyle": [
+          "assets/images/lifestyle/LIFE_L7-RO_countertop.jpg",
+          "assets/images/lifestyle/LIFE_RO_undersink.jpg"
+        ]
+      }
+    }
+  ],
+  "testimonials": [],
+  "offers": [],
+  "comparison": {
+    "rows": [],
+    "source": null,
+    "legalReviewed": false
+  },
+  "range": {
+    "lineupDesktop": "assets/images/models/RANGE_desktop.jpg",
+    "note": "Relative sizes in the lineup are visual, not to scale."
+  }
+}
