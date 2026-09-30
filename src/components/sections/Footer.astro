@@ -1,0 +1,154 @@
+---
+/** S14 Footer — company details, legal links, claims disclaimer (docs/11 §5). */
+import { Image } from 'astro:assets';
+import logo from '../../assets/brand/logo-horizontal-white.png';
+import DevMissing from '../ui/DevMissing.astro';
+import { copy } from '../../content/copy.en';
+import { company, phoneHref, phoneDisplay } from '../../content/product';
+
+const socials = Object.entries(company.social).filter((e): e is [string, string] => !!e[1]);
+const socialLabel: Record<string, string> = {
+  instagram: 'Instagram',
+  facebook: 'Facebook',
+  youtube: 'YouTube',
+  pinterest: 'Pinterest',
+};
+const year = new Date().getFullYear();
+---
+
+<footer class="footer" data-theme="ink">
+  <div class="container-page footer__grid">
+    <div class="footer__brand">
+      <Image src={logo} alt="Lennore" width={166} height={48} />
+      {company.officialTagline && <p class="footer__tagline">{company.officialTagline}</p>}
+    </div>
+
+    <div class="footer__company">
+      <p class="footer__legal">{company.legalName}</p>
+      {company.registeredAddress ? <p>{company.registeredAddress}</p> : <DevMissing k="company.registeredAddress" />}
+      {company.cin && <p>CIN {company.cin}</p>}
+      {
+        company.email && (
+          <p>
+            <a href={`mailto:${company.email}`}>{company.email}</a>
+          </p>
+        )
+      }
+      {
+        phoneHref ? (
+          <p>
+            <a href={phoneHref} data-track="phone_click" data-track-location="footer">
+              {phoneDisplay}
+            </a>
+          </p>
+        ) : (
+          <DevMissing k="company.phone" />
+        )
+      }
+    </div>
+
+    <nav class="footer__nav" aria-label="Legal and social">
+      <ul>
+        {
+          copy.footer.links.map((l) => (
+            <li>
+              <a href={l.href}>{l.label}</a>
+            </li>
+          ))
+        }
+        <li><a href={company.website} rel="noopener">{copy.footer.mainSite}</a></li>
+        {
+          socials.map(([k, url]) => (
+            <li>
+              <a href={url} rel="noopener" target="_blank">
+                {socialLabel[k] ?? k}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+
+  <div class="container-page footer__bottom">
+    <p class="footer__disclaimer">{copy.footer.disclaimer}</p>
+    <p class="footer__copy">© {year} {company.legalName}</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    padding-block: 64px 40px;
+    border-top: 1px solid var(--line);
+    background: var(--color-ink-0);
+    font-size: 15px;
+    color: var(--fg-2);
+  }
+  .footer__grid {
+    display: grid;
+    gap: 32px;
+  }
+  .footer__brand :global(img) {
+    height: 40px;
+    width: auto;
+  }
+  .footer__tagline {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--fg-muted);
+  }
+  .footer__company {
+    display: grid;
+    gap: 6px;
+  }
+  .footer__legal {
+    color: var(--fg);
+    font-weight: 600;
+  }
+  .footer a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: var(--fg-2);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--line);
+  }
+  .footer a:hover {
+    color: var(--fg);
+  }
+  .footer__company a {
+    min-height: 32px;
+  }
+  .footer__nav ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 24px;
+  }
+  .footer__bottom {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line);
+  }
+  .footer__disclaimer {
+    max-width: 80ch;
+    font-size: 13px;
+    line-height: 1.6;
+    color: var(--fg-muted);
+  }
+  .footer__copy {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--fg-muted);
+  }
+  @media (min-width: 1024px) {
+    .footer__grid {
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 48px;
+    }
+    .footer__nav ul {
+      flex-direction: column;
+      gap: 0;
+    }
+  }
+</style>

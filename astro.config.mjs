@@ -13,7 +13,8 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'ignore',
   build: {
-    inlineStylesheets: 'auto',
+    // All CSS is small (~10 KB gz): inlining removes render-blocking requests from the LCP path.
+    inlineStylesheets: 'always',
   },
   // No code blocks on this site; Shiki's inline styles are incompatible with CSP.
   markdown: { syntaxHighlight: false },

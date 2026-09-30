@@ -1,0 +1,93 @@
+---
+/**
+ * Mobile bottom action bar (docs/07 §2.7). CSS-only for now: always visible below 768 px.
+ * WhatsApp / Call appear only when their numbers exist in content/product.json.
+ */
+import Icon from './Icon.astro';
+import DevMissing from './DevMissing.astro';
+import { copy } from '../../content/copy.en';
+import { whatsappHref, phoneHref } from '../../content/product';
+
+interface Props {
+  ctaLabel: string;
+  whatsappText: string;
+}
+const { ctaLabel, whatsappText } = Astro.props;
+const wa = whatsappHref(whatsappText);
+---
+
+<nav class="sticky-bar" data-theme="ink" aria-label={copy.sticky.label}>
+  <a href="#book" class="sticky-bar__primary" data-track="sticky_cta_click" data-track-label="book_demo">
+    {ctaLabel}
+  </a>
+  {
+    wa ? (
+      <a href={wa} class="sticky-bar__icon" data-track="sticky_cta_click" data-track-label="whatsapp" target="_blank" rel="noopener">
+        <Icon name="whatsapp" size={22} />
+        <span>WhatsApp</span>
+      </a>
+    ) : (
+      <DevMissing k="company.whatsapp" />
+    )
+  }
+  {
+    phoneHref ? (
+      <a href={phoneHref} class="sticky-bar__icon" data-track="sticky_cta_click" data-track-label="call">
+        <Icon name="phone" size={22} />
+        <span>{copy.cta.call}</span>
+      </a>
+    ) : (
+      <DevMissing k="company.phone" />
+    )
+  }
+</nav>
+
+<style>
+  .sticky-bar {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: var(--z-sticky-bar);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 64px;
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+    background: color-mix(in oklab, var(--color-ink-1) 88%, transparent);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid var(--line);
+  }
+  .sticky-bar__primary {
+    flex: 1 1 55%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    border-radius: var(--radius-pill);
+    background: var(--cta-bg);
+    color: var(--cta-fg);
+    font-weight: 600;
+  }
+  .sticky-bar__icon {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 64px;
+    min-height: 48px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--line);
+    color: var(--fg);
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .sticky-bar__icon :global(svg) {
+    color: var(--color-ion-green);
+  }
+  @media (min-width: 768px) {
+    .sticky-bar {
+      display: none;
+    }
+  }
+</style>

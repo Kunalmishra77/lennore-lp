@@ -1,0 +1,127 @@
+---
+/**
+ * S7 Fits your space — one panel per installation type listed in product.json.
+ * Desktop: 3-column grid (Phase 8 pins it horizontally). Mobile: native scroll-snap carousel, no JS.
+ * Real photos are preferred (assets/ASSETS.md); AI scenes carry a neutral "Illustrative image" caption.
+ */
+import Img from '../ui/Img.astro';
+import Button from '../ui/Button.astro';
+import DevMissing from '../ui/DevMissing.astro';
+import { copy, fill } from '../../content/copy.en';
+import { hero, service, whatsappHref } from '../../content/product';
+import { img } from '../../lib/media';
+import type { VariantData } from '../../content/variants';
+
+interface Props {
+  variant: VariantData;
+}
+const { variant } = Astro.props;
+const panels = hero.installation.map((type) => ({ type, ...copy.fits.panels[type] }));
+const installedBy = fill(copy.fits.installedBy, { installationBy: service.installationBy });
+const wa = whatsappHref(variant.cta.whatsappText);
+---
+
+{
+  panels.length > 0 && (
+    <section class="fits section-y" data-theme="clear" data-motion="fits-your-space" aria-labelledby="fits-title">
+      <div class="container-page">
+        <h2 id="fits-title" class="h2">
+          {copy.fits.h2}
+        </h2>
+        {installedBy ? <p class="lede fits__lede">{installedBy}</p> : <DevMissing k="service.installationBy" block />}
+      </div>
+
+      <div class="container-page fits__track-wrap">
+        <ul class="fits__track" tabindex="0" aria-label="Installation options (scrolls sideways)">
+          {panels.map((p) => (
+            <li class="fits__panel">
+              <figure>
+                <Img
+                  src={img(p.image)}
+                  alt={p.alt}
+                  widths={[400, 600, 800]}
+                  sizes="(min-width: 1024px) 380px, 80vw"
+                  pictureClass="fits__img"
+                />
+                <figcaption class="fits__caption">{p.caption}</figcaption>
+              </figure>
+              <h3 class="fits__title">{p.title}</h3>
+              <p class="fits__body">{p.body}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="container-page fits__cta">
+        {wa ? (
+          <Button href={wa} variant="whatsapp" icon="whatsapp" track="whatsapp_click" trackLocation="s7" external>
+            {copy.fits.whatsappCta}
+          </Button>
+        ) : (
+          <DevMissing k="company.whatsapp" />
+        )}
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .fits__lede {
+    margin-top: 12px;
+  }
+  .fits__track-wrap {
+    margin-top: 40px;
+  }
+  .fits__track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 80%;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    padding-bottom: 12px;
+    scrollbar-width: thin;
+  }
+  .fits__panel {
+    scroll-snap-align: start;
+  }
+  .fits :global(.fits__img) {
+    display: block;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    aspect-ratio: 4 / 5;
+    background: var(--surface);
+  }
+  .fits :global(.fits__img img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .fits__caption {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--fg-muted);
+  }
+  .fits__title {
+    margin-top: 12px;
+    font-size: var(--text-h3);
+    line-height: var(--text-h3--line-height);
+  }
+  .fits__body {
+    margin-top: 6px;
+    color: var(--fg-2);
+  }
+  .fits__cta {
+    margin-top: 32px;
+  }
+  @media (min-width: 1024px) {
+    .fits__track {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(3, 1fr);
+      grid-auto-columns: auto;
+      gap: 32px;
+      overflow: visible;
+    }
+  }
+</style>

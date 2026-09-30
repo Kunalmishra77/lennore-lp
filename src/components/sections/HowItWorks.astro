@@ -1,0 +1,232 @@
+---
+/**
+ * S3 How it works — static final-state diagram + ordered list (the reduced-motion / no-JS view).
+ * SVG ids (#path-inlet, #filter, #plates, #branch-alk, #branch-acid, #spout) are the Phase 8 hooks.
+ * The filter stage renders only when filter.type exists; plate count/material only when known.
+ */
+import DevMissing from '../ui/DevMissing.astro';
+import Button from '../ui/Button.astro';
+import { copy, fill } from '../../content/copy.en';
+import { hero } from '../../content/product';
+
+const hasFilter = !!hero.filter.type;
+type Stage = { id: string; title: string; body: string | null; missing?: string };
+const stages: Stage[] = copy.how.stages.flatMap((s): Stage[] => {
+  if (s.id === 'filter') {
+    return hasFilter ? [{ id: s.id, title: s.title, body: fill(s.body, { filterType: hero.filter.type }) }] : [];
+  }
+  if ('bodyWithPlates' in s) {
+    const withPlates = fill(s.bodyWithPlates, { plates: hero.plates, plateMaterial: hero.plateMaterial });
+    return [
+      {
+        id: s.id,
+        title: s.title,
+        body: withPlates ?? s.body,
+        missing: withPlates ? undefined : `models.${hero.id}.plates / plateMaterial`,
+      },
+    ];
+  }
+  return [{ id: s.id, title: s.title, body: s.body }];
+});
+const cx = hasFilter ? 330 : 270; // chamber x
+const WORDS = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six'];
+const lede = fill(copy.how.lede, { steps: WORDS[stages.length] ?? String(stages.length) });
+---
+
+<section id="how" class="how section-y" data-theme="ink" data-motion="how-it-works" aria-labelledby="how-title">
+  <div class="container-page how__grid">
+    <div class="how__intro">
+      <h2 id="how-title" class="h2">{copy.how.h2}</h2>
+      <p class="lede how__lede">{lede}</p>
+    </div>
+
+    <figure class="how__diagram">
+      <svg viewBox="0 0 800 360" role="img" aria-label={copy.how.diagramLabel}>
+        <defs>
+          <linearGradient id="g-alk" x1="0" x2="1">
+            <stop offset="0" stop-color="#7FD6A4"></stop>
+            <stop offset="1" stop-color="#9FE8E1"></stop>
+          </linearGradient>
+        </defs>
+        <g class="dg-pipe">
+          <path id="path-inlet" pathLength="1" d={`M40 180 H${cx}`}></path>
+          <path
+            id="branch-alk"
+            class="dg-alk"
+            pathLength="1"
+            d={`M${cx + 200} 140 C${cx + 250} 140 ${cx + 260} 90 ${cx + 310} 90 H748`}></path>
+          <path
+            id="branch-acid"
+            class="dg-acid"
+            pathLength="1"
+            d={`M${cx + 200} 220 C${cx + 250} 220 ${cx + 260} 270 ${cx + 310} 270 H748`}></path>
+        </g>
+        {
+          hasFilter && (
+            <g id="filter">
+              <rect class="dg-box" x="150" y="130" width="110" height="100" rx="16" />
+              <text class="dg-label" x="205" y="258" text-anchor="middle">
+                Filter
+              </text>
+            </g>
+          )
+        }
+        <rect class="dg-box" x={cx} y="90" width="200" height="180" rx="22"></rect>
+        <g id="plates" class="dg-plates">
+          {[0, 1, 2, 3, 4].map((i) => <rect x={cx + 42 + i * 28} y="118" width="8" height="124" rx="4" />)}
+        </g>
+        <text class="dg-label" x={cx + 100} y="300" text-anchor="middle">Electrolysis chamber</text>
+        <g id="spout">
+          <circle class="dg-dot--alk" cx="756" cy="90" r="8"></circle>
+          <text class="dg-label dg-label--alk" x="764" y="62" text-anchor="end">Alkaline · spout</text>
+        </g>
+        <circle class="dg-dot--acid" cx="756" cy="270" r="8"></circle>
+        <text class="dg-label dg-label--acid" x="764" y="308" text-anchor="end">Acidic · Acidic Out</text>
+        <circle class="dg-dot--in" cx="40" cy="180" r="8"></circle>
+        <text class="dg-label" x="32" y="152">Water In</text>
+      </svg>
+    </figure>
+
+    <div class="how__steps">
+      <ol class="how__stages">
+        {
+          stages.map((s, i) => (
+            <li class="how__stage" data-stage={s.id}>
+              <span class="how__num" aria-hidden="true">
+                {i + 1}
+              </span>
+              <div>
+                <h3 class="how__stage-title">{s.title}</h3>
+                <p class="how__stage-body">{s.body}</p>
+                {s.missing && <DevMissing k={s.missing} />}
+              </div>
+            </li>
+          ))
+        }
+      </ol>
+      {!hasFilter && <DevMissing k={`models.${hero.id}.filter.type — stage "Filtered first" hidden`} block />}
+
+      <p class="how__cta">
+        <span>{copy.how.inlineCta} →</span>
+        <Button href="#book" variant="ghost" track="cta_click" trackLocation="s3" trackLabel={copy.how.inlineCtaLink}>
+          {copy.how.inlineCtaLink}
+        </Button>
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .how {
+    background: linear-gradient(180deg, var(--color-ink-1) 0%, var(--color-ink-3) 100%);
+  }
+  .how__grid {
+    display: grid;
+    gap: 40px;
+  }
+  .how__lede {
+    margin-top: 16px;
+  }
+  .how__diagram {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: rgb(5 8 7 / 0.35);
+    padding: 12px 4px;
+  }
+  .how__diagram svg {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .dg-pipe path {
+    fill: none;
+    stroke: var(--color-on-ink-muted);
+    stroke-width: 6;
+    stroke-linecap: round;
+  }
+  .dg-pipe .dg-alk {
+    stroke: url(#g-alk);
+  }
+  .dg-pipe .dg-acid {
+    stroke: var(--color-acid-amber);
+  }
+  .dg-box {
+    fill: var(--color-ink-2);
+    stroke: color-mix(in oklab, var(--color-on-ink) 30%, transparent);
+    stroke-width: 1.5;
+  }
+  .dg-plates rect {
+    fill: color-mix(in oklab, var(--color-on-ink) 45%, transparent);
+  }
+  .dg-dot--alk {
+    fill: var(--color-ion-aqua);
+  }
+  .dg-dot--acid {
+    fill: var(--color-acid-amber);
+  }
+  .dg-dot--in {
+    fill: var(--color-on-ink-2);
+  }
+  .dg-label {
+    fill: var(--color-on-ink-2);
+    font: 500 17px var(--font-body);
+  }
+  .dg-label--alk {
+    fill: var(--color-ion-aqua);
+  }
+  .dg-label--acid {
+    fill: var(--color-acid-amber);
+  }
+  .how__stages {
+    display: grid;
+    gap: 24px;
+  }
+  .how__stage {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 16px;
+    align-items: start;
+  }
+  .how__num {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid color-mix(in oklab, var(--accent) 60%, transparent);
+    color: var(--accent);
+    font-family: var(--font-display);
+    font-size: 16px;
+  }
+  .how__stage-title {
+    font-size: 20px;
+    line-height: 1.25;
+  }
+  .how__stage-body {
+    margin-top: 4px;
+    color: var(--fg-2);
+  }
+  .how__cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 8px;
+    margin-top: 32px;
+    color: var(--fg-2);
+  }
+
+  @media (min-width: 1024px) {
+    .how__grid {
+      grid-template-columns: 7fr 5fr;
+      column-gap: 64px;
+      row-gap: 48px;
+    }
+    .how__intro {
+      grid-column: 1 / -1;
+    }
+    .how__diagram {
+      align-self: start;
+      padding: 32px 24px;
+    }
+  }
+</style>

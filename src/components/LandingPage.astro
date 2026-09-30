@@ -1,0 +1,105 @@
+---
+/**
+ * The landing page for one variant. Section order follows docs/04 §2; "Choose your model" sits
+ * before Pricing (assets/ASSETS.md). Sections hide themselves when their data is missing.
+ */
+import Base from '../layouts/Base.astro';
+import SiteHeader from './ui/SiteHeader.astro';
+import StickyActionBar from './ui/StickyActionBar.astro';
+import Hero from './sections/Hero.astro';
+import ProductReveal from './sections/ProductReveal.astro';
+import HowItWorks from './sections/HowItWorks.astro';
+import ChooseYourWater from './sections/ChooseYourWater.astro';
+import FeatureShowcase from './sections/FeatureShowcase.astro';
+import BuiltToLast from './sections/BuiltToLast.astro';
+import FitsYourSpace from './sections/FitsYourSpace.astro';
+import Comparison from './sections/Comparison.astro';
+import ServiceTrust from './sections/ServiceTrust.astro';
+import Testimonials from './sections/Testimonials.astro';
+import ChooseModel from './sections/ChooseModel.astro';
+import Pricing from './sections/Pricing.astro';
+import FAQ from './sections/FAQ.astro';
+import LeadSection from './sections/LeadSection.astro';
+import Footer from './sections/Footer.astro';
+import { artDirected } from '../lib/art-direction';
+import { img } from '../lib/media';
+import { copy } from '../content/copy.en';
+import { company, hero } from '../content/product';
+import type { VariantData } from '../content/variants';
+
+interface Props {
+  variant: VariantData;
+}
+const { variant } = Astro.props;
+const still = hero.media.heroStill!;
+const heroArt = await artDirected({
+  mobile: img(still.mobile),
+  desktop: img(still.desktop),
+  mobileWidths: [480, 720, 960],
+  desktopWidths: [1024, 1440, 1920, 2560],
+  quality: 62,
+});
+const primary = variant.cta.primary ?? copy.cta.primary;
+const site = Astro.site ?? new URL('https://go.lennore.in');
+
+const jsonLd = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: company.legalName,
+    brand: company.brand,
+    url: company.website,
+    ...(company.email ? { email: company.email } : {}),
+    ...(company.phone ? { telephone: company.phone } : {}),
+    sameAs: Object.values(company.social).filter(Boolean),
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: hero.name,
+    brand: { '@type': 'Brand', name: company.brand },
+    image: new URL(heroArt.fallback.src, site).href,
+    description: copy.meta.description,
+  },
+];
+// Only the AVIF candidates are preloaded (all target browsers support AVIF; others fall back via <picture>).
+const preloads = heroArt.sources.filter((s) => s.type === 'image/avif');
+---
+
+<Base
+  title={copy.meta.title}
+  description={copy.meta.description}
+  canonicalPath="/"
+  robots={variant.index ? 'index, follow' : 'noindex, follow'}
+  lang={variant.lang}
+  variantId={variant.tracking.variantId}
+>
+  <Fragment slot="head">
+    {
+      preloads.map((p) => (
+        <link rel="preload" as="image" type={p.type} media={p.media} imagesrcset={p.srcset} imagesizes={p.sizes} fetchpriority="high" />
+      ))
+    }
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  </Fragment>
+
+  <SiteHeader slot="header" ctaLabel={primary} />
+
+  <Hero art={heroArt} variant={variant} />
+  <ProductReveal />
+  <HowItWorks />
+  <ChooseYourWater />
+  <FeatureShowcase variant={variant} />
+  <BuiltToLast />
+  <FitsYourSpace variant={variant} />
+  <Comparison enabled={variant.sections.comparison} />
+  <ServiceTrust variant={variant} />
+  <Testimonials enabled={variant.sections.testimonials} />
+  <ChooseModel variant={variant} />
+  <Pricing variant={variant} />
+  <FAQ />
+  <LeadSection variant={variant} />
+
+  <Footer slot="footer" />
+  <StickyActionBar slot="overlay" ctaLabel={copy.cta.primary} whatsappText={variant.cta.whatsappText} />
+</Base>

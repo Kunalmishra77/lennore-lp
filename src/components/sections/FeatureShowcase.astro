@@ -1,0 +1,177 @@
+---
+/**
+ * S5 Features — list is the real content; hotspots (Phase 8) are an enhancement.
+ * product.json features[] are still empty, so items are built only from facts that ARE filled in
+ * (display, controls, sidePorts, spout, autoClean). Titles are structural labels.
+ */
+import Img from '../ui/Img.astro';
+import Button from '../ui/Button.astro';
+import DevMissing from '../ui/DevMissing.astro';
+import { copy } from '../../content/copy.en';
+import { hero, whatsappHref } from '../../content/product';
+import { img } from '../../lib/media';
+import type { VariantData } from '../../content/variants';
+
+interface Props {
+  variant: VariantData;
+}
+const { variant } = Astro.props;
+
+const list = new Intl.ListFormat('en-IN', { style: 'long', type: 'conjunction' });
+const controls = hero.controls ?? [];
+const ports = hero.sidePorts ?? [];
+const t = copy.features.titles;
+
+const specFeatures = hero.features.filter((f) => f.title && f.body);
+type Item = { id: string; title: string; body: string; spec: string | null };
+const derived: Item[] = [];
+if (hero.display) derived.push({ id: 'display', title: t.display, body: `${hero.display.split(' — ')[0]}.`, spec: null });
+if (controls.length > 0) {
+  derived.push({ id: 'controls', title: t.controls, body: `${list.format(controls.filter((c) => c !== 'Auto Clean'))}.`, spec: null });
+}
+if (hero.autoClean === true && controls.includes('Auto Clean')) {
+  derived.push({
+    id: 'auto-clean',
+    title: t.autoClean,
+    body: ports.includes('Ionizer Cleaning')
+      ? 'An Auto Clean button on the front panel, and an Ionizer Cleaning port on the side.'
+      : 'An Auto Clean button on the front panel.',
+    spec: null,
+  });
+}
+if (hero.spout) derived.push({ id: 'spout', title: t.spout, body: `${hero.spout}.`, spec: null });
+if (ports.length > 0) derived.push({ id: 'ports', title: t.ports, body: `${list.format(ports)}.`, spec: null });
+
+const features: Item[] = specFeatures.length
+  ? specFeatures.map((f) => ({ id: f.id, title: f.title!, body: f.body!, spec: f.spec }))
+  : derived;
+
+const light = hero.media.lightTheme?.[0];
+const closeup = hero.media.revealStills?.desktop[2];
+const wa = whatsappHref(variant.cta.whatsappText);
+---
+
+{
+  features.length > 0 && (
+    <section id="features" class="feat section-y" data-theme="clear" data-motion="feature-showcase" aria-labelledby="feat-title">
+      <div class="container-page feat__grid">
+        <div class="feat__visual">
+          {light && (
+            <Img
+              src={img(light)}
+              alt={copy.features.imageAlt}
+              widths={[480, 720, 960, 1200]}
+              sizes="(min-width: 1024px) 560px, calc(100vw - 32px)"
+              pictureClass="feat__product"
+            />
+          )}
+        </div>
+
+        <div class="feat__content">
+          <h2 id="feat-title" class="h2">
+            {copy.features.h2}
+          </h2>
+          <p class="lede feat__lede">{copy.features.lede}</p>
+          {specFeatures.length === 0 && <DevMissing k={`models.${hero.id}.features[] (spec-sheet features + hotspots)`} block />}
+
+          <ul class="feat__list">
+            {features.map((f) => (
+              <li class="feat__item" data-feature={f.id}>
+                <h3 class="feat__title">{f.title}</h3>
+                <p class="feat__body">{f.body}</p>
+                {f.spec && <p class="feat__spec">{f.spec}</p>}
+                {f.id === 'display' && closeup && (
+                  <Img
+                    src={img(closeup)}
+                    alt={copy.features.closeupAlt}
+                    widths={[480, 720, 960]}
+                    sizes="(min-width: 1024px) 480px, calc(100vw - 32px)"
+                    pictureClass="feat__closeup"
+                  />
+                )}
+              </li>
+            ))}
+          </ul>
+
+          {wa ? (
+            <Button href={wa} variant="whatsapp" icon="whatsapp" track="whatsapp_click" trackLocation="s5" external>
+              {copy.features.whatsappCta}
+            </Button>
+          ) : (
+            <DevMissing k="company.whatsapp" />
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .feat__grid {
+    display: grid;
+    gap: 40px;
+  }
+  .feat :global(.feat__product) {
+    display: block;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    background: var(--color-clear-1);
+    aspect-ratio: 1;
+  }
+  .feat :global(.feat__product img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .feat__lede {
+    margin-top: 12px;
+  }
+  .feat__list {
+    display: grid;
+    margin-block: 32px;
+    border-top: 1px solid var(--line);
+  }
+  .feat__item {
+    padding-block: 24px;
+    border-bottom: 1px solid var(--line);
+  }
+  .feat__title {
+    font-size: var(--text-h3);
+    line-height: var(--text-h3--line-height);
+  }
+  .feat__body {
+    margin-top: 8px;
+    color: var(--fg-2);
+    max-width: 52ch;
+  }
+  .feat__spec {
+    margin-top: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .feat :global(.feat__closeup) {
+    display: block;
+    margin-top: 16px;
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    aspect-ratio: 16 / 9;
+  }
+  .feat :global(.feat__closeup img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (min-width: 1024px) {
+    .feat__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+    .feat__visual {
+      position: sticky;
+      top: 104px;
+    }
+  }
+</style>

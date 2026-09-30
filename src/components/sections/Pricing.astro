@@ -1,0 +1,83 @@
+---
+/** S11 Pricing / offer — renders only when priceFrom is set. */
+import Button from '../ui/Button.astro';
+import DevMissing from '../ui/DevMissing.astro';
+import { copy } from '../../content/copy.en';
+import { hero } from '../../content/product';
+import type { VariantData } from '../../content/variants';
+
+interface Props {
+  variant: VariantData;
+}
+const { variant } = Astro.props;
+const show = variant.sections.pricing && hero.priceFrom !== null;
+const price = hero.priceFrom?.toLocaleString('en-IN');
+const offer = variant.offer.enabled && variant.offer.text ? variant.offer : null;
+const primary = variant.cta.primary ?? copy.cta.primary;
+---
+
+{
+  show ? (
+    <section class="price section-y" data-theme="ink" data-motion="pricing" aria-labelledby="price-title">
+      <div class="container-page price__card">
+        <h2 id="price-title" class="h2">
+          {copy.pricing.h2}
+        </h2>
+        <p class="price__from">
+          {copy.pricing.from} <strong>₹{price}</strong>
+        </p>
+        {hero.priceInclusions.length > 0 && (
+          <ul class="price__incl">
+            {hero.priceInclusions.map((i) => (
+              <li>{i}</li>
+            ))}
+          </ul>
+        )}
+        {hero.emi && <p class="price__emi">{hero.emi}</p>}
+        {offer && (
+          <p class="price__offer">
+            {offer.text}
+            {offer.validTill && <span> · valid till {offer.validTill}</span>}
+          </p>
+        )}
+        <Button href="#book" track="cta_click" trackLocation="s11" trackLabel={primary}>
+          {primary}
+        </Button>
+      </div>
+    </section>
+  ) : (
+    variant.sections.pricing && (
+      <div class="container-page">
+        <DevMissing k={`S11 Pricing hidden — needs models.${hero.id}.priceFrom`} block />
+      </div>
+    )
+  )
+}
+
+<style>
+  .price__card {
+    display: grid;
+    gap: 16px;
+    justify-items: start;
+  }
+  .price__from {
+    font-size: 20px;
+    color: var(--fg-2);
+  }
+  .price__from strong {
+    font-family: var(--font-display);
+    font-size: 40px;
+    color: var(--fg);
+  }
+  .price__incl {
+    display: grid;
+    gap: 6px;
+    color: var(--fg-2);
+  }
+  .price__offer {
+    padding: 8px 14px;
+    border-radius: var(--radius-pill);
+    border: 1px solid var(--color-brand-gold);
+    color: var(--color-brand-gold);
+  }
+</style>

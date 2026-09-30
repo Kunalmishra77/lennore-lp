@@ -1,0 +1,33 @@
+---
+/**
+ * Privacy notice — built only from the DPDP-aligned draft in docs/11 §6 and known company facts.
+ * Must be reviewed by Lennore's counsel before launch (retention period, grievance officer, etc.).
+ */
+import SimplePage from '../layouts/SimplePage.astro';
+import DevMissing from '../components/ui/DevMissing.astro';
+import { company } from '../content/product';
+---
+
+<SimplePage title="Privacy Notice — Lennore" description="How Lennore uses the details you share to book a home demo." heading="Privacy Notice">
+  <DevMissing k="Legal review of this notice (retention period, grievance officer, processors list)" block />
+  <p>This notice explains how {company.legalName} ("Lennore", "we") uses the details you share on this page.</p>
+
+  <h2>What we collect</h2>
+  <p>When you book a demo: your name, mobile number and pincode.</p>
+
+  <h2>Why we use it</h2>
+  <p>We use your name, mobile number and pincode to arrange your demo and contact you about it by call and WhatsApp.</p>
+
+  <h2>Who we share it with</h2>
+  <p>We share limited data with advertising partners to measure our ads.</p>
+
+  <h2>Your choices</h2>
+  <p>
+    You can withdraw consent or ask us to delete your details at any time by writing to
+    {company.email ? <a href={`mailto:${company.email}`}>{company.email}</a> : <DevMissing k="company.email" />}.
+  </p>
+
+  <h2>Who we are</h2>
+  <p>{company.legalName}{company.cin ? `, CIN ${company.cin}` : ''}.</p>
+  {company.registeredAddress ? <p>{company.registeredAddress}</p> : <DevMissing k="company.registeredAddress" block />}
+</SimplePage>

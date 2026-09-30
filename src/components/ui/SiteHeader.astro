@@ -1,0 +1,114 @@
+---
+/**
+ * Desktop: fixed header with anchors + Book Demo (shown always for now; Phase 8 reveals it after the hero).
+ * Mobile: logo only, overlaid on the hero (actions live in the sticky bottom bar).
+ */
+import { Image } from 'astro:assets';
+import logo from '../../assets/brand/logo-horizontal-white.png';
+import Button from './Button.astro';
+import { copy } from '../../content/copy.en';
+
+interface Props {
+  ctaLabel: string;
+}
+const { ctaLabel } = Astro.props;
+---
+
+<header class="site-header" data-theme="ink">
+  <div class="container-page site-header__inner">
+    <a href="#main" class="site-header__logo" aria-label="Lennore — back to top">
+      <Image src={logo} alt="" width={138} height={40} loading="eager" />
+    </a>
+    <nav aria-label="Page sections" class="site-header__nav">
+      <ul>
+        {
+          copy.nav.map((item) => (
+            <li>
+              <a href={item.href}>{item.label}</a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <Button
+      href="#book"
+      class="site-header__cta"
+      track="cta_click"
+      trackLocation="header"
+      trackLabel={copy.cta.primaryShort}
+      ariaLabel={ctaLabel}
+    >
+      {copy.cta.primaryShort}
+    </Button>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: absolute;
+    inset: 0 0 auto;
+    z-index: var(--z-header);
+    background: transparent;
+  }
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    height: 64px;
+  }
+  .site-header__logo {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+  .site-header__logo :global(img) {
+    height: 30px;
+    width: auto;
+  }
+  .site-header__nav,
+  .site-header :global(.site-header__cta) {
+    display: none;
+  }
+  @media (min-width: 768px) {
+    .site-header {
+      position: fixed;
+      background: color-mix(in oklab, var(--color-ink-1) 90%, transparent);
+      backdrop-filter: blur(14px) saturate(1.2);
+      -webkit-backdrop-filter: blur(14px) saturate(1.2);
+      border-bottom: 1px solid var(--line);
+    }
+    .site-header__inner {
+      height: 72px;
+    }
+    .site-header__logo :global(img) {
+      height: 34px;
+    }
+    .site-header :global(.site-header__cta) {
+      display: inline-flex;
+      min-height: 44px;
+      padding-block: 10px;
+    }
+  }
+  @media (min-width: 1024px) {
+    .site-header__nav {
+      display: block;
+    }
+    .site-header__nav ul {
+      display: flex;
+      gap: 32px;
+    }
+    .site-header__nav a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      color: var(--fg-2);
+      font-size: 15px;
+      font-weight: 500;
+      transition: color 250ms var(--ease-out);
+    }
+    .site-header__nav a:hover {
+      color: var(--fg);
+    }
+  }
+</style>

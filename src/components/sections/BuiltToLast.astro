@@ -1,0 +1,104 @@
+---
+/**
+ * S6 Built to last — fact tiles from product.json only. The section needs at least two sourced
+ * facts to stand on its own; otherwise it is hidden in production (dev shows what is missing).
+ */
+import Img from '../ui/Img.astro';
+import DevMissing from '../ui/DevMissing.astro';
+import { copy } from '../../content/copy.en';
+import { hero } from '../../content/product';
+import { img } from '../../lib/media';
+
+const t = copy.built.tiles;
+const candidates = [
+  {
+    key: `models.${hero.id}.plates / plateMaterial`,
+    value: hero.plates ? String(hero.plates) : null,
+    label: hero.plateMaterial ? `${hero.plateMaterial} ${t.plates}` : t.plates,
+  },
+  { key: `models.${hero.id}.filter.lifeLitres`, value: hero.filter.lifeLitres?.toLocaleString('en-IN') ?? null, label: t.filter },
+  { key: `models.${hero.id}.autoClean`, value: hero.autoClean ? t.autoClean : null, label: 'on the front panel' },
+  { key: `models.${hero.id}.warranty.machine`, value: hero.warranty.machine, label: t.warranty },
+];
+const tiles = candidates.filter((c) => c.value);
+const missingKeys = candidates.filter((c) => !c.value).map((c) => c.key);
+const show = tiles.length >= 2;
+const side = hero.media.lightTheme?.[1];
+---
+
+{
+  show ? (
+    <section class="built section-y" data-theme="clear" data-motion="built-to-last" aria-labelledby="built-title">
+      <div class="container-page built__grid">
+        <div>
+          <h2 id="built-title" class="h2">
+            {copy.built.h2}
+          </h2>
+          <p class="lede built__sub">{copy.built.sub}</p>
+          <ul class="built__tiles">
+            {tiles.map((tile) => (
+              <li class="built__tile">
+                <p class="built__value">{tile.value}</p>
+                <p class="built__label">{tile.label}</p>
+              </li>
+            ))}
+          </ul>
+          {missingKeys.map((k) => (
+            <DevMissing k={k} />
+          ))}
+        </div>
+        {side && (
+          <Img src={img(side)} alt="Side view of the Lennore L9 showing its ports" widths={[480, 720, 960]} sizes="(min-width: 1024px) 520px, calc(100vw - 32px)" pictureClass="built__img" />
+        )}
+      </div>
+    </section>
+  ) : (
+    <div class="container-page">
+      <DevMissing k={`S6 Built to last hidden — needs ≥2 of: ${missingKeys.join(', ')}`} block />
+    </div>
+  )
+}
+
+<style>
+  .built__grid {
+    display: grid;
+    gap: 40px;
+  }
+  .built__sub {
+    margin-top: 12px;
+  }
+  .built__tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+    margin-top: 32px;
+  }
+  .built__tile {
+    padding: 20px;
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+  }
+  .built__value {
+    font-family: var(--font-display);
+    font-size: 32px;
+    line-height: 1.1;
+    color: var(--heading);
+  }
+  .built__label {
+    margin-top: 6px;
+    color: var(--fg-2);
+    font-size: 15px;
+  }
+  .built :global(.built__img) {
+    display: block;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+  }
+  @media (min-width: 1024px) {
+    .built__grid {
+      grid-template-columns: 7fr 5fr;
+      gap: 64px;
+      align-items: center;
+    }
+  }
+</style>

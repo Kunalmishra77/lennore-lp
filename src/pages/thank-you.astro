@@ -1,0 +1,21 @@
+---
+/**
+ * Post-submit page (noindex, nofollow). Reads nothing from the query string except, later, an opaque
+ * `ref` (Phase 10). No PII is ever shown or sent from here.
+ */
+import SimplePage from '../layouts/SimplePage.astro';
+import DevMissing from '../components/ui/DevMissing.astro';
+import { service } from '../content/product';
+---
+
+<SimplePage title="Thank you — Lennore" description="Your demo request has been received." robots="noindex, nofollow" heading="Thank you.">
+  <p>We've received your demo request.</p>
+  {
+    service.responseSlaHours ? (
+      <p>We'll contact you within {service.responseSlaHours} working hours to fix a time.</p>
+    ) : (
+      <DevMissing k="service.responseSlaHours" block />
+    )
+  }
+  <p><a href="/">Back to the page</a></p>
+</SimplePage>

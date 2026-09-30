@@ -1,0 +1,153 @@
+---
+/**
+ * Step-1 lead form (docs/04 S13). Works without JS: standard POST to /api/lead, which returns 303 to
+ * /thank-you (Phase 10). Hidden attribution fields are filled by lib/attribution.ts (Phase 10).
+ * No PII ever goes into URLs or analytics events.
+ */
+import { copy } from '../../content/copy.en';
+
+interface Props {
+  variantId: string;
+}
+const { variantId } = Astro.props;
+const f = copy.lead.fields;
+const attribution = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'gclid', 'gbraid', 'wbraid', 'fbclid', 'landing_url', 'referrer'];
+const noticeParts = copy.lead.notice.split('{privacy}');
+---
+
+<form class="lead-form" method="post" action="/api/lead" novalidate={false} data-lead-form aria-labelledby="lead-title">
+  <div class="lead-form__field">
+    <label for="lead-name">{f.name}</label>
+    <input id="lead-name" name="name" type="text" autocomplete="name" required minlength="2" maxlength="80" />
+  </div>
+
+  <div class="lead-form__field">
+    <label for="lead-phone">{f.phone}</label>
+    <div class="lead-form__phone">
+      <span class="lead-form__prefix" aria-hidden="true">+91</span>
+      <input
+        id="lead-phone"
+        name="phone"
+        type="tel"
+        inputmode="numeric"
+        autocomplete="tel-national"
+        required
+        pattern="[6-9][0-9]{9}"
+        maxlength="10"
+        aria-describedby="lead-phone-hint"
+      />
+    </div>
+    <p id="lead-phone-hint" class="lead-form__hint">10-digit Indian mobile number</p>
+  </div>
+
+  <div class="lead-form__field">
+    <label for="lead-pincode">{f.pincode}</label>
+    <input
+      id="lead-pincode"
+      name="pincode"
+      type="text"
+      inputmode="numeric"
+      autocomplete="postal-code"
+      required
+      pattern="[1-9][0-9]{5}"
+      maxlength="6"
+      aria-describedby="lead-pincode-hint"
+    />
+    <p id="lead-pincode-hint" class="lead-form__hint">6 digits</p>
+  </div>
+
+  <div class="lead-form__hp" aria-hidden="true">
+    <label for="lead-website">Leave this empty</label>
+    <input id="lead-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+  <input type="hidden" name="landing_variant" value={variantId} />
+  <input type="hidden" name="started_at" value="" />
+  {attribution.map((a) => <input type="hidden" name={a} value="" />)}
+
+  <button type="submit" class="lead-form__submit" data-track="form_submit">{copy.lead.submit}</button>
+
+  <p class="lead-form__notice">
+    {noticeParts[0]}<a href="/privacy">{copy.lead.privacyLabel}</a>{noticeParts[1]}
+  </p>
+</form>
+
+<style>
+  .lead-form {
+    display: grid;
+    gap: 20px;
+  }
+  .lead-form__field label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .lead-form input[type='text'],
+  .lead-form input[type='tel'] {
+    width: 100%;
+    min-height: 52px;
+    padding: 12px 16px;
+    border: 1px solid color-mix(in oklab, var(--fg) 24%, transparent);
+    border-radius: var(--radius-sm);
+    background: var(--color-ink-1);
+    color: var(--fg);
+    font-size: 17px; /* ≥16px avoids iOS zoom */
+  }
+  .lead-form input:focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 1px;
+    border-color: transparent;
+  }
+  .lead-form input:user-invalid {
+    border-color: var(--color-error);
+  }
+  .lead-form__phone {
+    position: relative;
+  }
+  .lead-form__prefix {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--fg-2);
+    font-size: 17px;
+  }
+  .lead-form__phone input[type='tel'] {
+    padding-left: 56px;
+  }
+  .lead-form__hint {
+    margin-top: 6px;
+    font-size: 13px;
+    color: var(--fg-muted);
+  }
+  .lead-form__hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .lead-form__submit {
+    min-height: 56px;
+    border-radius: var(--radius-pill);
+    background: var(--cta-bg);
+    color: var(--cta-fg);
+    font-weight: 600;
+    font-size: 17px;
+    cursor: pointer;
+    transition: background-color 250ms var(--ease-out);
+  }
+  .lead-form__submit:hover {
+    background: color-mix(in oklab, var(--cta-bg) 88%, white);
+  }
+  .lead-form__notice {
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--fg-2);
+  }
+  .lead-form__notice a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

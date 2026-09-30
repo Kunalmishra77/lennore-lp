@@ -1,0 +1,192 @@
+---
+/**
+ * S1 Hero. The art-directed still is the LCP element (fetchpriority=high, preloaded by the page).
+ * The ambient video swap-in is added in Phase 8; it never replaces the LCP image.
+ */
+import ArtPicture from '../ui/ArtPicture.astro';
+import Button from '../ui/Button.astro';
+import DevMissing from '../ui/DevMissing.astro';
+import type { ArtDirected } from '../../lib/art-direction';
+import { copy, fill } from '../../content/copy.en';
+import { hero, service, phRange, whatsappHref } from '../../content/product';
+import type { VariantData } from '../../content/variants';
+
+interface Props {
+  art: ArtDirected;
+  variant: VariantData;
+}
+const { art, variant } = Astro.props;
+
+const eyebrow = variant.hero.eyebrow ?? copy.hero.eyebrow;
+const h1 = variant.hero.h1 ?? copy.hero.h1;
+const sub =
+  variant.hero.sub ?? (phRange ? fill(copy.hero.sub, { count: phRange.count, min: phRange.min, max: phRange.max }) : null);
+const primary = variant.cta.primary ?? copy.cta.primary;
+const wa = whatsappHref(variant.cta.whatsappText);
+
+const chips = [
+  { key: 'service.demoCities', text: fill(copy.hero.chips.city, { city: service.demoCities[0] }) },
+  { key: `models.${hero.id}.warranty.machine`, text: fill(copy.hero.chips.warranty, { warranty: hero.warranty.machine }) },
+  { key: 'service.installationBy', text: service.installationBy ? copy.hero.chips.installation : null },
+];
+---
+
+<section class="hero" data-theme="ink" data-motion="hero" aria-labelledby="hero-title">
+  <ArtPicture art={art} alt={copy.hero.imageAlt} priority class="hero__media" imgClass="hero__img" />
+  <div class="hero__scrim" aria-hidden="true"></div>
+
+  <div class="container-page hero__inner">
+    <div class="hero__copy">
+      <p class="eyebrow">{eyebrow}</p>
+      <h1 id="hero-title" class="hero__title">{h1}</h1>
+      {sub ? <p class="hero__sub">{sub}</p> : <DevMissing k={`models.${hero.id}.phLevels`} block />}
+
+      <div class="hero__ctas">
+        <Button href="#book" size="lg" track="cta_click" trackLocation="hero" trackLabel={primary}>
+          {primary}
+        </Button>
+        {
+          wa ? (
+            <Button href={wa} variant="whatsapp" size="lg" icon="whatsapp" track="whatsapp_click" trackLocation="hero" external>
+              {copy.cta.whatsapp}
+            </Button>
+          ) : (
+            <DevMissing k="company.whatsapp" />
+          )
+        }
+      </div>
+
+      <ul class="hero__chips" aria-label="Why book a demo">
+        {chips.map((c) => (c.text ? <li class="hero__chip">{c.text}</li> : <DevMissing k={c.key} />))}
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Mobile: stacked — copy on top, product image fills the remaining height (never under the copy). */
+  .hero {
+    position: relative;
+    isolation: isolate;
+    display: flex;
+    flex-direction: column;
+    min-height: 100svh;
+    overflow: hidden;
+    background: var(--color-ink-1);
+  }
+  .hero :global(.hero__media) {
+    order: 2;
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 320px;
+    margin-top: -48px;
+    z-index: -2;
+    -webkit-mask-image: linear-gradient(180deg, transparent 0, #000 22%);
+    mask-image: linear-gradient(180deg, transparent 0, #000 22%);
+  }
+  .hero :global(.hero__img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 82%;
+  }
+  .hero__scrim {
+    display: none;
+  }
+  .hero__inner {
+    order: 1;
+    display: flex;
+    padding-top: 80px;
+    padding-bottom: 8px;
+  }
+  .hero__copy {
+    max-width: 34rem;
+  }
+  .hero__title {
+    margin-top: 12px;
+    font-size: clamp(40px, 11vw, 44px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--fg);
+  }
+  .hero__sub {
+    margin-top: 16px;
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--fg-2);
+    max-width: 30rem;
+  }
+  .hero__ctas {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .hero__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .hero__chip {
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    font-size: 13px;
+    color: var(--fg-2);
+    background: rgb(7 16 12 / 0.4);
+  }
+  .hero__chips:empty {
+    display: none;
+  }
+
+  @media (min-width: 480px) {
+    .hero__ctas {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .hero {
+      flex-direction: row;
+    }
+    .hero :global(.hero__media) {
+      position: absolute;
+      inset: 0;
+      min-height: 0;
+      margin: 0;
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+    .hero :global(.hero__img) {
+      object-position: 72% 60%;
+    }
+    .hero__scrim {
+      display: block;
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+      background: linear-gradient(90deg, rgb(7 16 12 / 0.7) 0%, rgb(7 16 12 / 0.25) 45%, rgb(7 16 12 / 0) 65%);
+    }
+    .hero__inner {
+      align-items: center;
+      padding-top: 72px;
+      padding-bottom: 72px;
+    }
+    .hero__copy {
+      max-width: min(40rem, 46%);
+    }
+    .hero__title {
+      font-size: var(--text-display);
+    }
+    .hero__sub {
+      font-size: var(--text-body-l);
+    }
+    .hero__ctas {
+      margin-top: 32px;
+    }
+  }
+</style>

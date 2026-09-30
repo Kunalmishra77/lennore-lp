@@ -1,0 +1,113 @@
+---
+/**
+ * Link-style button. Tracking is declarative (data-track*) and wired by lib/analytics.ts in Phase 11 —
+ * components never call gtag/fbq directly.
+ */
+import Icon from './Icon.astro';
+
+type Variant = 'primary' | 'secondary' | 'ghost' | 'whatsapp';
+interface Props {
+  href: string;
+  variant?: Variant;
+  size?: 'md' | 'lg';
+  icon?: 'whatsapp' | 'phone' | 'arrow' | 'mail';
+  /** docs/08 §3 event name, e.g. cta_click | whatsapp_click | phone_click | sticky_cta_click */
+  track?: string;
+  trackLocation?: string;
+  trackLabel?: string;
+  external?: boolean;
+  class?: string;
+  ariaLabel?: string;
+}
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  icon,
+  track,
+  trackLocation,
+  trackLabel,
+  external = false,
+  class: cls,
+  ariaLabel,
+} = Astro.props;
+---
+
+<a
+  href={href}
+  class:list={['btn', `btn--${variant}`, `btn--${size}`, cls]}
+  data-track={track}
+  data-track-location={trackLocation}
+  data-track-label={trackLabel}
+  aria-label={ariaLabel}
+  {...external ? { target: '_blank', rel: 'noopener' } : {}}
+>
+  {icon && icon !== 'arrow' && <Icon name={icon} size={20} />}
+  <span><slot /></span>
+  {icon === 'arrow' && <Icon name="arrow" size={18} class="btn__arrow" />}
+</a>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    min-height: 48px;
+    padding: 12px 22px;
+    border-radius: var(--radius-pill);
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 1.2;
+    text-decoration: none;
+    text-align: center;
+    border: 1px solid transparent;
+    transition:
+      background-color 250ms var(--ease-out),
+      border-color 250ms var(--ease-out),
+      transform 250ms var(--ease-out);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn--lg {
+    min-height: 56px;
+    padding: 14px 28px;
+    font-size: 17px;
+  }
+  .btn--primary {
+    background: var(--cta-bg);
+    color: var(--cta-fg);
+  }
+  .btn--primary:hover {
+    background: color-mix(in oklab, var(--cta-bg) 88%, white);
+  }
+  .btn--secondary,
+  .btn--whatsapp {
+    background: color-mix(in oklab, var(--fg) 6%, transparent);
+    border-color: var(--line);
+    color: var(--fg);
+  }
+  .btn--secondary:hover,
+  .btn--whatsapp:hover {
+    border-color: color-mix(in oklab, var(--fg) 40%, transparent);
+  }
+  .btn--whatsapp :global(svg) {
+    color: var(--color-ion-green);
+  }
+  [data-theme='clear'] .btn--whatsapp :global(svg) {
+    color: var(--color-ion-green-on-light);
+  }
+  .btn--ghost {
+    min-height: 44px;
+    padding-inline: 4px;
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-thickness: 1px;
+  }
+  .btn :global(.btn__arrow) {
+    transition: transform 250ms var(--ease-out);
+  }
+  .btn:hover :global(.btn__arrow) {
+    transform: translateX(3px);
+  }
+</style>

@@ -1,0 +1,364 @@
+---
+/**
+ * S4 Choose your water — works without JS: native radios + static :has() rules show the selected
+ * level and tint the glass. Keyboard: arrow keys move between levels (native radio group).
+ * Phase 8 adds the animated display/drop and the auto-demo on top of the same markup.
+ *
+ * Levels, labels and pH values come from product.json. "Best for" / "For drinking" render only when
+ * the manual values are filled in. Glass colours use the provisional design-token pH scale until
+ * reagentColor is supplied, and the footnote says they are illustrative.
+ */
+import Button from '../ui/Button.astro';
+import DevMissing from '../ui/DevMissing.astro';
+import { copy } from '../../content/copy.en';
+import { hero, phLevels } from '../../content/product';
+
+function tone(ph: number): string {
+  if (ph <= 4.5) return 'acid-strong';
+  if (ph < 7) return 'acid-mild';
+  if (ph === 7) return 'neutral';
+  if (ph <= 8.5) return 'alk-mild';
+  return 'alk-strong';
+}
+const levels = [...phLevels]
+  .map((l) => ({ ...l, value: Number.parseFloat(l.ph) }))
+  .sort((a, b) => a.value - b.value)
+  .map((l) => ({ ...l, tone: tone(l.value) }));
+const defaultId = levels.find((l) => l.stream === 'neutral')?.id ?? levels[0]?.id;
+const anyUse = levels.some((l) => l.recommendedUse);
+const anyDrink = levels.some((l) => l.drinkable !== null);
+const anyColour = levels.some((l) => l.reagentColor);
+---
+
+{
+  levels.length > 0 && (
+    <section id="choose" class="cyw section-y" data-theme="clear" data-motion="choose-your-water" aria-labelledby="cyw-title">
+      <div class="container-page">
+        <div class="cyw__head">
+          <h2 id="cyw-title" class="h2">
+            {copy.choose.h2}
+          </h2>
+          <p class="lede cyw__instruction">{copy.choose.instruction}</p>
+        </div>
+
+        <div class="cyw__stage">
+          <div class="cyw__controls">
+            <div class="cyw__screen" aria-live="polite">
+              <ul class="cyw__results">
+                {levels.map((l) => (
+                  <li class="cyw__result" data-level={l.id}>
+                    <p class="cyw__ph">
+                      <span class="cyw__ph-prefix">{copy.choose.phPrefix}</span> {l.ph}
+                    </p>
+                    <p class="cyw__label">{l.label}</p>
+                    <p class="cyw__stream" data-stream={l.stream}>
+                      {copy.choose.streams[l.stream]}
+                    </p>
+                    {l.recommendedUse && (
+                      <p class="cyw__detail">
+                        {copy.choose.bestFor}: {l.recommendedUse}
+                      </p>
+                    )}
+                    {l.drinkable !== null && (
+                      <p class="cyw__detail">
+                        {copy.choose.drinking}: {l.drinkable ? 'Yes' : 'No'}
+                      </p>
+                    )}
+                  </li>
+                ))}
+              </ul>
+              {!anyUse && <DevMissing k={`models.${hero.id}.phLevels[].recommendedUse`} block />}
+              {!anyDrink && <DevMissing k={`models.${hero.id}.phLevels[].drinkable`} block />}
+            </div>
+
+            <fieldset class="cyw__levels">
+              <legend class="cyw__legend">{copy.choose.legend}</legend>
+              <div class="cyw__chips">
+                {levels.map((l) => (
+                  <label class="cyw__chip" data-stream={l.stream}>
+                    <input
+                      type="radio"
+                      name="ph-level"
+                      value={l.id}
+                      class={`tone-${l.tone}`}
+                      checked={l.id === defaultId}
+                      data-track="ph_select"
+                      data-track-level={l.ph}
+                    />
+                    <span class="cyw__chip-face">
+                      <span class="cyw__chip-ph">{l.ph}</span>
+                      <span class="cyw__chip-label">{l.label}</span>
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          </div>
+
+          <figure class="cyw__glass">
+            <svg viewBox="0 0 240 300" role="img" aria-label={copy.choose.glassAlt}>
+              <defs>
+                <clipPath id="glass-clip">
+                  <path d="M52 40 L188 40 L172 272 Q170 284 158 284 L82 284 Q70 284 68 272 Z" />
+                </clipPath>
+              </defs>
+              <circle class="cyw__drop" cx="120" cy="14" r="7" />
+              <g clip-path="url(#glass-clip)">
+                <rect class="cyw__water" x="40" y="96" width="160" height="200" />
+                <ellipse class="cyw__bloom" cx="120" cy="110" rx="70" ry="10" />
+              </g>
+              <path class="cyw__glass-line" d="M52 40 L188 40 L172 272 Q170 284 158 284 L82 284 Q70 284 68 272 Z" />
+              <path class="cyw__glass-shine" d="M72 60 L64 250" />
+            </svg>
+            {!anyColour && <DevMissing k={`models.${hero.id}.phLevels[].reagentColor (using token colours)`} block />}
+          </figure>
+        </div>
+
+        <p class="cyw__footnote">{copy.choose.footnote}</p>
+        <div class="cyw__cta">
+          <Button href="#book" track="cta_click" trackLocation="s4" trackLabel={copy.choose.cta} icon="arrow">
+            {copy.choose.cta}
+          </Button>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .cyw__instruction {
+    margin-top: 12px;
+  }
+  .cyw__stage {
+    --water: var(--color-ph-neutral);
+    display: grid;
+    gap: 32px;
+    margin-top: 40px;
+  }
+
+  .cyw__controls,
+  .cyw__glass {
+    min-width: 0; /* grid items: don't let the scrolling chip row widen the page */
+  }
+
+  /* ---- "machine screen" readout ---- */
+  .cyw__screen {
+    min-height: 196px;
+    padding: 24px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(160deg, var(--color-brand-teal-deep), #0f3a3c);
+    color: var(--color-on-ink);
+    box-shadow: inset 0 0 0 1px rgb(159 232 225 / 0.25);
+  }
+  .cyw__result {
+    display: block;
+  }
+  .cyw__result + .cyw__result {
+    margin-top: 16px;
+  }
+  .cyw__ph {
+    font-family: var(--font-display);
+    font-size: clamp(44px, 12vw, 64px);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-on-ink);
+  }
+  .cyw__ph-prefix {
+    font-size: 0.4em;
+    letter-spacing: 0;
+    color: var(--color-on-ink-2);
+    vertical-align: 0.6em;
+  }
+  .cyw__label {
+    margin-top: 8px;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .cyw__stream {
+    margin-top: 4px;
+    font-size: 14px;
+    color: var(--color-ion-aqua);
+  }
+  .cyw__stream[data-stream='acidic'] {
+    color: var(--color-acid-amber);
+  }
+  .cyw__stream[data-stream='neutral'] {
+    color: var(--color-on-ink-2);
+  }
+  .cyw__detail {
+    margin-top: 6px;
+    font-size: 15px;
+    color: var(--color-on-ink-2);
+  }
+
+  /* ---- level chips ---- */
+  .cyw__levels {
+    margin-top: 20px;
+    min-width: 0;
+  }
+  .cyw__legend {
+    margin-bottom: 10px;
+    font-size: var(--text-eyebrow);
+    letter-spacing: var(--text-eyebrow--letter-spacing);
+    text-transform: uppercase;
+    font-weight: 600;
+    color: var(--fg-muted);
+  }
+  .cyw__chips {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 4px 16px 12px 4px;
+    margin-inline: -4px -16px;
+    scrollbar-width: thin;
+  }
+  .cyw__chip {
+    position: relative;
+    flex: 0 0 auto;
+    scroll-snap-align: start;
+    cursor: pointer;
+  }
+  .cyw__chip input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+  .cyw__chip-face {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 88px;
+    min-height: 56px;
+    padding: 8px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--color-white);
+    transition:
+      border-color 150ms var(--ease-out),
+      background-color 150ms var(--ease-out);
+  }
+  .cyw__chip-ph {
+    font-family: var(--font-display);
+    font-size: 18px;
+    line-height: 1.2;
+    color: var(--fg);
+  }
+  .cyw__chip-label {
+    font-size: 12px;
+    line-height: 1.3;
+    color: var(--fg-muted);
+    white-space: nowrap;
+  }
+  .cyw__chip:hover .cyw__chip-face {
+    border-color: var(--color-on-clear-muted);
+  }
+  .cyw__chip input:checked + .cyw__chip-face {
+    border-color: var(--color-brand-teal-deep);
+    background: var(--color-brand-teal-deep);
+  }
+  .cyw__chip input:checked + .cyw__chip-face .cyw__chip-ph,
+  .cyw__chip input:checked + .cyw__chip-face .cyw__chip-label {
+    color: var(--color-clear-0);
+  }
+  .cyw__chip input:focus-visible + .cyw__chip-face {
+    outline: 2px solid var(--color-brand-teal-deep);
+    outline-offset: 3px;
+  }
+
+  /* ---- glass ---- */
+  .cyw__glass {
+    display: grid;
+    justify-items: center;
+  }
+  .cyw__glass svg {
+    width: min(240px, 60vw);
+    height: auto;
+  }
+  .cyw__water,
+  .cyw__drop {
+    fill: var(--water);
+    transition: fill 450ms var(--ease-out);
+  }
+  .cyw__bloom {
+    fill: rgb(255 255 255 / 0.35);
+  }
+  .cyw__glass-line {
+    fill: rgb(255 255 255 / 0.25);
+    stroke: var(--color-on-clear-muted);
+    stroke-width: 2;
+  }
+  .cyw__glass-shine {
+    stroke: rgb(255 255 255 / 0.7);
+    stroke-width: 4;
+    stroke-linecap: round;
+  }
+
+  .cyw__footnote {
+    margin-top: 32px;
+    max-width: 60ch;
+    font-size: 14px;
+    color: var(--fg-muted);
+  }
+  .cyw__cta {
+    margin-top: 24px;
+  }
+
+  /* ---- selection state (no JS). Without :has() every level stays listed. ---- */
+  @supports selector(:has(*)) {
+    .cyw__result {
+      display: none;
+    }
+    .cyw__result + .cyw__result {
+      margin-top: 0;
+    }
+    .cyw__stage:has(.cyw__chip:nth-child(1) input:checked) .cyw__result:nth-child(1),
+    .cyw__stage:has(.cyw__chip:nth-child(2) input:checked) .cyw__result:nth-child(2),
+    .cyw__stage:has(.cyw__chip:nth-child(3) input:checked) .cyw__result:nth-child(3),
+    .cyw__stage:has(.cyw__chip:nth-child(4) input:checked) .cyw__result:nth-child(4),
+    .cyw__stage:has(.cyw__chip:nth-child(5) input:checked) .cyw__result:nth-child(5),
+    .cyw__stage:has(.cyw__chip:nth-child(6) input:checked) .cyw__result:nth-child(6),
+    .cyw__stage:has(.cyw__chip:nth-child(7) input:checked) .cyw__result:nth-child(7),
+    .cyw__stage:has(.cyw__chip:nth-child(8) input:checked) .cyw__result:nth-child(8),
+    .cyw__stage:has(.cyw__chip:nth-child(9) input:checked) .cyw__result:nth-child(9),
+    .cyw__stage:has(.cyw__chip:nth-child(10) input:checked) .cyw__result:nth-child(10),
+    .cyw__stage:has(.cyw__chip:nth-child(11) input:checked) .cyw__result:nth-child(11),
+    .cyw__stage:has(.cyw__chip:nth-child(12) input:checked) .cyw__result:nth-child(12) {
+      display: block;
+    }
+    .cyw__stage:has(input.tone-acid-strong:checked) {
+      --water: var(--color-ph-acid-strong);
+    }
+    .cyw__stage:has(input.tone-acid-mild:checked) {
+      --water: var(--color-ph-acid-mild);
+    }
+    .cyw__stage:has(input.tone-neutral:checked) {
+      --water: var(--color-ph-neutral);
+    }
+    .cyw__stage:has(input.tone-alk-mild:checked) {
+      --water: var(--color-ph-alk-mild);
+    }
+    .cyw__stage:has(input.tone-alk-strong:checked) {
+      --water: var(--color-ph-alk-strong);
+    }
+  }
+
+  @media (min-width: 768px) {
+    .cyw__stage {
+      grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+      align-items: center;
+      gap: 48px;
+    }
+    .cyw__chips {
+      flex-wrap: wrap;
+      overflow: visible;
+      margin: 0;
+      padding: 4px;
+    }
+    .cyw__glass svg {
+      width: 260px;
+    }
+  }
+</style>

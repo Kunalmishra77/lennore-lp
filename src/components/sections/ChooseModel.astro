@@ -1,0 +1,106 @@
+---
+/**
+ * Choose your model — the range, name + card image only (client decision 2026-09-30).
+ * Specs appear per card only once they are in product.json. L9 remains the page's main product.
+ */
+import Img from '../ui/Img.astro';
+import Button from '../ui/Button.astro';
+import { copy } from '../../content/copy.en';
+import { product } from '../../content/product';
+import { img } from '../../lib/media';
+import type { VariantData } from '../../content/variants';
+
+interface Props {
+  variant: VariantData;
+}
+const { variant } = Astro.props;
+const cards = variant.models
+  .map((id) => product.models.find((m) => m.id === id))
+  .filter((m): m is NonNullable<typeof m> => !!m && !!m.media.card)
+  .map((m) => ({ id: m.id, name: m.name, isHero: m.isHero, card: img(m.media.card!) }));
+const show = variant.sections.models && cards.length > 1;
+---
+
+{
+  show && (
+    <section id="models" class="models section-y" data-theme="ink" data-motion="choose-model" aria-labelledby="models-title">
+      <div class="container-page">
+        <h2 id="models-title" class="h2">
+          {copy.models.h2}
+        </h2>
+        <p class="lede models__lede">{copy.models.lede}</p>
+        <ul class="models__track" tabindex="0" aria-label="Lennore models (scrolls sideways)">
+          {cards.map((c) => (
+            <li class:list={['models__card', { 'models__card--hero': c.isHero }]}>
+              <Img
+                src={c.card}
+                alt={c.name}
+                widths={[360, 540, 720]}
+                sizes="(min-width: 1024px) 360px, 72vw"
+                pictureClass="models__img"
+              />
+              <h3 class="models__name">{c.name}</h3>
+            </li>
+          ))}
+        </ul>
+        <div class="models__cta">
+          <Button href="#book" variant="secondary" icon="arrow" track="cta_click" trackLocation="models" trackLabel={copy.models.cta}>
+            {copy.models.cta}
+          </Button>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .models__lede {
+    margin-top: 12px;
+  }
+  .models__track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 72%;
+    gap: 16px;
+    margin-top: 40px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 12px;
+    scrollbar-width: thin;
+  }
+  .models__card {
+    scroll-snap-align: start;
+  }
+  .models :global(.models__img) {
+    display: block;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--line);
+    aspect-ratio: 4 / 5;
+  }
+  .models :global(.models__img img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .models__card--hero :global(.models__img) {
+    border-color: color-mix(in oklab, var(--accent) 60%, transparent);
+  }
+  .models__name {
+    margin-top: 14px;
+    font-size: 20px;
+    line-height: 1.3;
+  }
+  .models__cta {
+    margin-top: 32px;
+  }
+  @media (min-width: 1024px) {
+    .models__track {
+      grid-auto-flow: row;
+      grid-template-columns: repeat(3, 1fr);
+      grid-auto-columns: auto;
+      gap: 32px;
+      overflow: visible;
+    }
+  }
+</style>

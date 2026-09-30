@@ -1,0 +1,16 @@
+---
+/** Campaign variants from src/content/variants/*.json (noindex, canonical → /). */
+import type { GetStaticPaths } from 'astro';
+import LandingPage from '../components/LandingPage.astro';
+import { variants, type VariantData } from '../content/variants';
+
+export const getStaticPaths = (() =>
+  variants.filter((v) => v.slug !== '').map((v) => ({ params: { variant: v.slug }, props: { variant: v } }))) satisfies GetStaticPaths;
+
+interface Props {
+  variant: VariantData;
+}
+const { variant } = Astro.props;
+---
+
+<LandingPage variant={variant} />

@@ -1,0 +1,149 @@
+---
+/** S13 Book your demo — form + alternatives; reassurance bullets only when true per product.json. */
+import LeadForm from '../ui/LeadForm.astro';
+import Button from '../ui/Button.astro';
+import DevMissing from '../ui/DevMissing.astro';
+import Icon from '../ui/Icon.astro';
+import { copy, fill } from '../../content/copy.en';
+import { company, service, whatsappHref, phoneHref, phoneDisplay } from '../../content/product';
+import type { VariantData } from '../../content/variants';
+
+interface Props {
+  variant: VariantData;
+}
+const { variant } = Astro.props;
+const wa = whatsappHref(variant.cta.whatsappText);
+const b = copy.lead.bullets;
+
+const bullets = [
+  { key: 'service.demoDurationMinutes', text: fill(b.duration, { minutes: service.demoDurationMinutes }) },
+  // Not in product.json yet — needs client confirmation before it can be shown.
+  { key: 'service.noObligation (client to confirm)', text: null as string | null },
+  { key: 'company.whatsapp', text: wa ? b.whatsappConfirm : null },
+];
+---
+
+<section id="book" class="lead section-y" data-theme="ink" data-motion="lead" aria-labelledby="lead-title">
+  <div class="lead__glow" aria-hidden="true"></div>
+  <div class="container-page lead__grid">
+    <div class="lead__intro">
+      <h2 id="lead-title" class="h2">{copy.lead.h2}</h2>
+      <ul class="lead__bullets">
+        {
+          bullets.map((x) =>
+            x.text ? (
+              <li>
+                <Icon name="check" size={20} />
+                <span>{x.text}</span>
+              </li>
+            ) : (
+              <DevMissing k={x.key} />
+            ),
+          )
+        }
+      </ul>
+    </div>
+
+    <div class="lead__card">
+      <LeadForm variantId={variant.tracking.variantId} />
+    </div>
+
+    <div class="lead__alt">
+      <p class="lead__alt-title">{copy.lead.alternatives}</p>
+      <div class="lead__alt-links">
+        {
+          wa ? (
+            <Button href={wa} variant="whatsapp" icon="whatsapp" track="whatsapp_click" trackLocation="s13" external>
+              {copy.cta.whatsapp}
+            </Button>
+          ) : (
+            <DevMissing k="company.whatsapp" />
+          )
+        }
+        {
+          phoneHref ? (
+            <Button href={phoneHref} variant="secondary" icon="phone" track="phone_click" trackLocation="s13">
+              {`${copy.cta.call} ${phoneDisplay}`}
+            </Button>
+          ) : (
+            <DevMissing k="company.phone" />
+          )
+        }
+        {
+          company.email && (
+            <Button href={`mailto:${company.email}`} variant="secondary" icon="mail">
+              {company.email}
+            </Button>
+          )
+        }
+      </div>
+      {company.supportHours ? <p class="lead__hours">{company.supportHours}</p> : <DevMissing k="company.supportHours" />}
+    </div>
+  </div>
+</section>
+
+<style>
+  .lead {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+  .lead__glow {
+    position: absolute;
+    inset: 10% -20% auto;
+    height: 70%;
+    z-index: -1;
+    background: radial-gradient(50% 50% at 60% 50%, rgb(127 214 164 / 0.18) 0%, rgb(127 214 164 / 0) 70%);
+  }
+  .lead__grid {
+    display: grid;
+    gap: 32px;
+  }
+  .lead__bullets {
+    display: grid;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .lead__bullets li {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    color: var(--fg-2);
+  }
+  .lead__bullets :global(svg) {
+    flex: none;
+    margin-top: 2px;
+    color: var(--accent);
+  }
+  .lead__card {
+    padding: 24px;
+    border-radius: var(--radius-md);
+    background: color-mix(in oklab, var(--color-ink-2) 92%, transparent);
+    border: 1px solid var(--line);
+  }
+  .lead__alt-title {
+    font-weight: 600;
+  }
+  .lead__alt-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .lead__hours {
+    margin-top: 12px;
+    font-size: 14px;
+    color: var(--fg-muted);
+  }
+  @media (min-width: 1024px) {
+    .lead__grid {
+      grid-template-columns: 5fr 6fr;
+      column-gap: 64px;
+      align-items: start;
+    }
+    .lead__card {
+      grid-row: span 2;
+      padding: 40px;
+    }
+  }
+</style>

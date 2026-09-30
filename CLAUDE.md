@@ -58,7 +58,7 @@ Four models exist (L9, L5, L5+RO, L7+RO). L9 is the hero model. Other models app
 
 ## Stack (fixed — do not swap without asking)
 
-- **Astro 6** (static output) + **TypeScript** (strict)
+- **Astro 7** (static output, latest stable 7.x — upgraded from 6 on 2026-09-30, see docs/decisions.md) + **TypeScript** (strict)
 - **Tailwind CSS v4** with tokens from `design/tokens.json` mapped into `@theme`
 - **GSAP 3.13+** (free incl. all plugins): core, ScrollTrigger, SplitText. Use `gsap.context()` / `matchMedia()` for cleanup.
 - **Lenis** — desktop pointer:fine only, synced to ScrollTrigger.

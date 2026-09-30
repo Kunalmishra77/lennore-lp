@@ -1,0 +1,163 @@
+---
+/**
+ * S2 Product Reveal — static Plan B view: three real-photo stills with chapter captions
+ * (HERO → KEY_side_right → KEY_display). This is also the reduced-motion / no-JS view.
+ * Phase 8 turns it into a pinned crossfade; a future render can switch to SequencePlayer when
+ * product.media.revealSequence is set.
+ */
+import ArtPicture from '../ui/ArtPicture.astro';
+import DevMissing from '../ui/DevMissing.astro';
+import { artDirected } from '../../lib/art-direction';
+import { img } from '../../lib/media';
+import { copy, fill } from '../../content/copy.en';
+import { hero } from '../../content/product';
+
+const stills = hero.media.revealStills;
+const ports = hero.sidePorts ?? [];
+const listFormat = new Intl.ListFormat('en-IN', { style: 'long', type: 'conjunction' });
+
+const bodies: Record<string, { text: string | null; missing: string }> = {
+  design: {
+    text: fill(copy.reveal.chapters[0].body, { spout: hero.spout ? hero.spout.charAt(0).toLowerCase() + hero.spout.slice(1) : null }),
+    missing: `models.${hero.id}.spout`,
+  },
+  side: {
+    text: ports.length ? fill(copy.reveal.chapters[1].body, { ports: listFormat.format(ports) }) : null,
+    missing: `models.${hero.id}.sidePorts`,
+  },
+  display: { text: copy.reveal.chapters[2].body, missing: '' },
+};
+
+const chapters = stills
+  ? await Promise.all(
+      copy.reveal.chapters.map(async (ch, i) => ({
+        ...ch,
+        body: bodies[ch.id],
+        art: await artDirected({
+          mobile: img(stills.mobile[i]!),
+          desktop: img(stills.desktop[i]!),
+          mobileWidths: [480, 720, 960],
+          desktopWidths: [720, 1024, 1440, 1920],
+          mobileSizes: 'calc(100vw - 32px)',
+          desktopSizes: '(min-width: 1264px) 720px, 58vw',
+        }),
+      })),
+    )
+  : [];
+const controls = hero.controls ?? [];
+---
+
+{
+  chapters.length > 0 ? (
+    <section class="reveal section-y" data-theme="ink" data-motion="product-reveal" aria-labelledby="reveal-title">
+      <div class="container-page">
+        <h2 id="reveal-title" class="h2 reveal__title">{copy.reveal.h2}</h2>
+        <ol class="reveal__chapters">
+          {chapters.map((ch, i) => (
+            <li class="reveal__chapter" data-chapter={ch.id}>
+              <figure class="reveal__figure">
+                <ArtPicture art={ch.art} alt={ch.alt} class="reveal__media" imgClass="reveal__img" />
+              </figure>
+              <div class="reveal__text">
+                <p class="reveal__num" aria-hidden="true">0{i + 1}</p>
+                <h3 class="reveal__chapter-title">{ch.title}</h3>
+                {ch.body?.text ? <p class="reveal__body">{ch.body.text}</p> : ch.body?.missing && <DevMissing k={ch.body.missing} block />}
+                {ch.id === 'display' && controls.length > 0 && (
+                  <ul class="reveal__controls" aria-label="Controls on the panel">
+                    {controls.map((c) => (
+                      <li>{c}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </section>
+  ) : (
+    <DevMissing k={`models.${hero.id}.media.revealStills`} block />
+  )
+}
+
+<style>
+  .reveal__title {
+    max-width: 18ch;
+  }
+  .reveal__chapters {
+    display: grid;
+    gap: 64px;
+    margin-top: 48px;
+  }
+  .reveal__chapter {
+    display: grid;
+    gap: 20px;
+  }
+  .reveal__figure {
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    background: var(--color-ink-0);
+    aspect-ratio: 4 / 5;
+  }
+  .reveal :global(.reveal__img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 70%;
+  }
+  .reveal__chapter[data-chapter='display'] :global(.reveal__img) {
+    object-position: 50% 45%;
+  }
+  .reveal__num {
+    font-family: var(--font-display);
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+  }
+  .reveal__chapter-title {
+    margin-top: 8px;
+    font-size: var(--text-overlay);
+    line-height: var(--text-overlay--line-height);
+  }
+  .reveal__body {
+    margin-top: 12px;
+    color: var(--fg-2);
+    font-size: 17px;
+    max-width: 34ch;
+  }
+  .reveal__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 16px;
+  }
+  .reveal__controls li {
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    font-size: 14px;
+    color: var(--fg-2);
+  }
+
+  @media (min-width: 768px) {
+    .reveal__chapters {
+      gap: 96px;
+      margin-top: 64px;
+    }
+    .reveal__chapter {
+      grid-template-columns: 5fr 7fr;
+      align-items: center;
+      gap: 48px;
+    }
+    .reveal__figure {
+      order: 2;
+      aspect-ratio: 16 / 10;
+    }
+    .reveal :global(.reveal__img) {
+      object-position: 70% 60%;
+    }
+    .reveal__chapter[data-chapter='display'] :global(.reveal__img) {
+      object-position: 50% 50%;
+    }
+  }
+</style>

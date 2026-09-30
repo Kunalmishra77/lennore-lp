@@ -1,0 +1,18 @@
+---
+/** Terms of use — minimal until Lennore supplies its terms. Nothing here invents commercial terms. */
+import SimplePage from '../layouts/SimplePage.astro';
+import DevMissing from '../components/ui/DevMissing.astro';
+import { company } from '../content/product';
+---
+
+<SimplePage title="Terms of Use — Lennore" description="Terms of use for this Lennore page." heading="Terms of Use">
+  <DevMissing k="Full terms of use / sale from Lennore's counsel" block />
+  <p>This page is operated by {company.legalName}.</p>
+  <p>
+    Product information on this page is for general guidance. Specifications are subject to change; refer to the product manual.
+    Prices, offers, warranty and service terms apply only as confirmed in writing by Lennore.
+  </p>
+  <p>
+    Questions: {company.email ? <a href={`mailto:${company.email}`}>{company.email}</a> : <DevMissing k="company.email" />}.
+  </p>
+</SimplePage>

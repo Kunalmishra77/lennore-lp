@@ -1,0 +1,69 @@
+---
+/**
+ * S10 Customer stories — only consented testimonials from product.json (consentOnFile: true is
+ * enforced by the schema). No section at all when there are none.
+ */
+import DevMissing from '../ui/DevMissing.astro';
+import { copy } from '../../content/copy.en';
+import { product } from '../../content/product';
+
+interface Props {
+  enabled: boolean;
+}
+const { enabled } = Astro.props;
+const items = product.testimonials;
+const show = enabled && items.length > 0;
+---
+
+{
+  show ? (
+    <section class="stories section-y" data-theme="ink" data-motion="testimonials" aria-labelledby="stories-title">
+      <div class="container-page">
+        <h2 id="stories-title" class="h2">
+          {copy.stories.h2}
+        </h2>
+        <ul class="stories__grid">
+          {items.map((t) => (
+            <li class="stories__card">
+              <blockquote>
+                <p>“{t.quote}”</p>
+              </blockquote>
+              <p class="stories__who">
+                {t.name}, {t.city} · {t.month}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  ) : (
+    enabled && (
+      <div class="container-page">
+        <DevMissing k="S10 Customer stories hidden — needs testimonials[] with consent" block />
+      </div>
+    )
+  )
+}
+
+<style>
+  .stories__grid {
+    display: grid;
+    gap: 16px;
+    margin-top: 32px;
+  }
+  .stories__card {
+    padding: 24px;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+  }
+  .stories__who {
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--fg-muted);
+  }
+  @media (min-width: 768px) {
+    .stories__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

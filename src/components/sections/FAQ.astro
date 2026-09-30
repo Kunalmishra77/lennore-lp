@@ -1,0 +1,128 @@
+---
+/**
+ * S12 FAQ — <details> accordion (works without JS). An item renders only if every {token} in its
+ * answer resolves from product.json; JSON-LD FAQPage is built from the same visible items.
+ */
+import DevMissing from '../ui/DevMissing.astro';
+import Icon from '../ui/Icon.astro';
+import { copy, fill } from '../../content/copy.en';
+import { faq } from '../../content/faq.en';
+import { hero, service, phLevels } from '../../content/product';
+
+const list = new Intl.ListFormat('en-IN', { style: 'long', type: 'conjunction' });
+const byStream = (s: string) =>
+  phLevels
+    .filter((l) => l.stream === s)
+    .map((l) => l.ph)
+    .sort((a, b) => Number.parseFloat(a) - Number.parseFloat(b));
+const alk = byStream('alkaline');
+const acid = byStream('acidic');
+const neutral = byStream('neutral');
+const levelParts = [
+  neutral.length ? `a neutral level (pH ${list.format(neutral)})` : null,
+  alk.length ? `${alk.length} alkaline levels (pH ${list.format(alk)})` : null,
+  acid.length ? `${acid.length} acidic levels (pH ${list.format(acid)})` : null,
+].filter((x): x is string => !!x);
+
+const drinkingKnown = phLevels.some((l) => l.drinkable !== null);
+const drinkingLevels = drinkingKnown
+  ? `The manual lists these levels for drinking: ${list.format(phLevels.filter((l) => l.drinkable).map((l) => `${l.label} (pH ${l.ph})`))}.`
+  : null;
+
+const values: Record<string, string | number | null> = {
+  levelList: levelParts.length ? list.format(levelParts) : null,
+  waterGuidance: null,
+  drinkingLevels,
+  filterLife: hero.filter.lifeLitres?.toLocaleString('en-IN') ?? null,
+  filterMonths: hero.filter.lifeMonthsTypical,
+  filterPrice: hero.filter.replacementPrice?.toLocaleString('en-IN') ?? null,
+  warranty: hero.warranty.machine,
+  installationBy: service.installationBy,
+  leadDays: service.installationLeadTimeDays,
+  power: hero.powerConsumption,
+  demoMinutes: service.demoDurationMinutes,
+  cities: service.demoCities.length ? list.format(service.demoCities) : null,
+  emi: hero.emi,
+};
+
+const items = faq.map((f) => ({ ...f, answer: fill(f.a, values) }));
+const visible = items.filter((i) => i.answer);
+const hidden = items.filter((i) => !i.answer);
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: visible.map((i) => ({
+    '@type': 'Question',
+    name: i.q,
+    acceptedAnswer: { '@type': 'Answer', text: i.answer },
+  })),
+};
+---
+
+{
+  visible.length > 0 && (
+    <section id="faq" class="faq section-y" data-theme="ink" data-motion="faq" aria-labelledby="faq-title">
+      <div class="container-page faq__inner">
+        <h2 id="faq-title" class="h2">
+          {copy.faq.h2}
+        </h2>
+        <div class="faq__list">
+          {visible.map((i, n) => (
+            <details class="faq__item" open={n === 0} data-track="faq_open" data-question-id={i.id}>
+              <summary class="faq__q">
+                <span>{i.q}</span>
+                <Icon name="plus" size={20} class="faq__icon" />
+              </summary>
+              <p class="faq__a">{i.answer}</p>
+            </details>
+          ))}
+        </div>
+        {hidden.length > 0 && <DevMissing k={`FAQ hidden: ${hidden.map((h) => h.id).join(', ')}`} block />}
+      </div>
+      <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    </section>
+  )
+}
+
+<style>
+  .faq__inner {
+    max-width: 880px;
+  }
+  .faq__list {
+    margin-top: 40px;
+    border-top: 1px solid var(--line);
+  }
+  .faq__item {
+    border-bottom: 1px solid var(--line);
+  }
+  .faq__q {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 64px;
+    padding-block: 18px;
+    font-family: var(--font-display);
+    font-size: 19px;
+    line-height: 1.35;
+    cursor: pointer;
+    list-style: none;
+  }
+  .faq__q::-webkit-details-marker {
+    display: none;
+  }
+  .faq__q :global(.faq__icon) {
+    flex: none;
+    color: var(--accent);
+    transition: transform 250ms var(--ease-out);
+  }
+  .faq__item[open] :global(.faq__icon) {
+    transform: rotate(45deg);
+  }
+  .faq__a {
+    padding-bottom: 24px;
+    color: var(--fg-2);
+    max-width: 68ch;
+  }
+</style>

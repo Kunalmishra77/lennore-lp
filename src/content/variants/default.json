@@ -1,0 +1,11 @@
+{
+  "slug": "",
+  "lang": "en-IN",
+  "index": true,
+  "hero": { "eyebrow": null, "h1": null, "sub": null },
+  "cta": { "primary": null, "whatsappText": "Hi Lennore, I'd like to book a free home demo." },
+  "offer": { "enabled": false, "text": null, "validTill": null },
+  "sections": { "comparison": true, "testimonials": true, "models": true, "pricing": true },
+  "models": ["l5", "l9", "l7-ro"],
+  "tracking": { "variantId": "default-v1" }
+}

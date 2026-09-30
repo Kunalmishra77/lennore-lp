@@ -1,0 +1,27 @@
+---
+/** Renders an art-directed picture produced by lib/art-direction.ts. */
+import type { ArtDirected } from '../../lib/art-direction';
+
+interface Props {
+  art: ArtDirected;
+  alt: string;
+  priority?: boolean;
+  class?: string;
+  imgClass?: string;
+}
+const { art, alt, priority = false, class: cls, imgClass } = Astro.props;
+---
+
+<picture class={cls}>
+  {art.sources.map((s) => <source type={s.type} media={s.media} srcset={s.srcset} sizes={s.sizes} />)}
+  <img
+    src={art.fallback.src}
+    width={art.fallback.width}
+    height={art.fallback.height}
+    alt={alt}
+    class={imgClass}
+    decoding={priority ? 'sync' : 'async'}
+    loading={priority ? 'eager' : 'lazy'}
+    fetchpriority={priority ? 'high' : 'auto'}
+  />
+</picture>

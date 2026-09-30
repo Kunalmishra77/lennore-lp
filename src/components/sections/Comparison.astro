@@ -1,0 +1,81 @@
+---
+/** S8 Ionizer vs RO + alkaline cartridge — renders only with rows AND legalReviewed: true. */
+import DevMissing from '../ui/DevMissing.astro';
+import { copy } from '../../content/copy.en';
+import { product } from '../../content/product';
+
+interface Props {
+  enabled: boolean;
+}
+const { enabled } = Astro.props;
+const { rows, legalReviewed, source } = product.comparison;
+const show = enabled && legalReviewed && rows.length > 0;
+---
+
+{
+  show ? (
+    <section class="cmp section-y" data-theme="clear" data-motion="comparison" aria-labelledby="cmp-title">
+      <div class="container-page">
+        <h2 id="cmp-title" class="h2">
+          {copy.comparison.h2}
+        </h2>
+        <div class="cmp__table-wrap">
+          <table class="cmp__table">
+            <thead>
+              <tr>
+                <th scope="col">
+                  <span class="sr-only">Topic</span>
+                </th>
+                <th scope="col" class="cmp__lennore">Lennore ionizer</th>
+                <th scope="col">RO with alkaline cartridge</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr>
+                  <th scope="row">{r.label}</th>
+                  <td class="cmp__lennore">{r.ionizer}</td>
+                  <td>{r.roCartridge}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {source && <p class="cmp__source">Source: {source}</p>}
+      </div>
+    </section>
+  ) : (
+    enabled && (
+      <div class="container-page">
+        <DevMissing k="S8 Comparison hidden — needs comparison.rows + legalReviewed: true" block />
+      </div>
+    )
+  )
+}
+
+<style>
+  .cmp__table-wrap {
+    margin-top: 32px;
+    overflow-x: auto;
+  }
+  .cmp__table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 520px;
+  }
+  .cmp__table th,
+  .cmp__table td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  .cmp__lennore {
+    background: color-mix(in oklab, var(--accent) 8%, transparent);
+  }
+  .cmp__source {
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--fg-muted);
+  }
+</style>

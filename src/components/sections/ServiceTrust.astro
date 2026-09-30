@@ -1,0 +1,165 @@
+---
+/**
+ * S9 Service & trust — only verified blocks. Company identity (legal name, CIN, email, website) is
+ * always available; warranty / installation / coverage appear when product.json has them.
+ * LIFE_L5_model-with-glass.jpg is NOT used until the model release for paid ads is confirmed.
+ */
+import Button from '../ui/Button.astro';
+import DevMissing from '../ui/DevMissing.astro';
+import { copy, fill } from '../../content/copy.en';
+import { company, hero, service, whatsappHref } from '../../content/product';
+import type { VariantData } from '../../content/variants';
+
+interface Props {
+  variant: VariantData;
+}
+const { variant } = Astro.props;
+const b = copy.service.blocks;
+const list = new Intl.ListFormat('en-IN', { style: 'long', type: 'conjunction' });
+
+const blocks = [
+  { key: `models.${hero.id}.warranty.machine`, title: b.warranty, body: hero.warranty.machine },
+  { key: 'service.installationBy', title: b.installation, body: service.installationBy },
+  {
+    key: 'service.demoCities',
+    title: service.demoCities.length ? fill(b.coverage, { cities: list.format(service.demoCities) }) : null,
+    body: service.responseSlaHours ? `We respond within ${service.responseSlaHours} working hours.` : '',
+  },
+];
+const wa = whatsappHref(variant.cta.whatsappText);
+const site = company.website.replace(/^https?:\/\//, '');
+---
+
+<section id="service" class="svc section-y" data-theme="ink" data-motion="service" aria-labelledby="svc-title">
+  <div class="container-page">
+    <h2 id="svc-title" class="h2">{copy.service.h2}</h2>
+
+    <div class="svc__grid">
+      {
+        blocks.map((bl) =>
+          bl.title && bl.body !== null ? (
+            <article class="svc__block">
+              <h3 class="svc__title">{bl.title}</h3>
+              {bl.body && <p class="svc__body">{bl.body}</p>}
+            </article>
+          ) : (
+            <DevMissing k={bl.key} />
+          ),
+        )
+      }
+
+      <article class="svc__block svc__block--company">
+        <h3 class="svc__title">{b.company}</h3>
+        <p class="svc__body">{fill(copy.service.companyLine, { legalName: company.legalName })}</p>
+        <dl class="svc__facts">
+          {
+            company.cin && (
+              <div>
+                <dt>{copy.service.cinLabel}</dt>
+                <dd>{company.cin}</dd>
+              </div>
+            )
+          }
+          {
+            company.email && (
+              <div>
+                <dt>{copy.service.emailLabel}</dt>
+                <dd>
+                  <a href={`mailto:${company.email}`}>{company.email}</a>
+                </dd>
+              </div>
+            )
+          }
+          <div>
+            <dt>{copy.service.websiteLabel}</dt>
+            <dd>
+              <a href={company.website} rel="noopener">{site}</a>
+            </dd>
+          </div>
+          {
+            company.registeredAddress ? (
+              <div>
+                <dt>Registered office</dt>
+                <dd>{company.registeredAddress}</dd>
+              </div>
+            ) : (
+              <DevMissing k="company.registeredAddress" />
+            )
+          }
+        </dl>
+      </article>
+    </div>
+
+    <div class="svc__cta">
+      {
+        wa ? (
+          <Button href={wa} variant="whatsapp" icon="whatsapp" track="whatsapp_click" trackLocation="s9" external>
+            {copy.service.whatsappCta}
+          </Button>
+        ) : company.email ? (
+          <Button href={`mailto:${company.email}`} variant="secondary" icon="mail">
+            {copy.lead.email}
+          </Button>
+        ) : null
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .svc__grid {
+    display: grid;
+    gap: 16px;
+    margin-top: 40px;
+  }
+  .svc__block {
+    padding: 28px;
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    border: 1px solid var(--line);
+  }
+  .svc__title {
+    font-size: var(--text-h3);
+    line-height: var(--text-h3--line-height);
+  }
+  .svc__body {
+    margin-top: 10px;
+    color: var(--fg-2);
+  }
+  .svc__facts {
+    display: grid;
+    gap: 12px;
+    margin-top: 20px;
+  }
+  .svc__facts div {
+    display: grid;
+    grid-template-columns: 9rem 1fr;
+    gap: 12px;
+  }
+  .svc__facts dt {
+    color: var(--fg-2);
+    font-size: 14px;
+  }
+  .svc__facts dd {
+    overflow-wrap: anywhere;
+  }
+  .svc__facts a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .svc__cta {
+    margin-top: 32px;
+  }
+  @media (max-width: 479px) {
+    .svc__facts div {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+  }
+  @media (min-width: 1024px) {
+    .svc__block--company {
+      max-width: 720px;
+    }
+  }
+</style>
