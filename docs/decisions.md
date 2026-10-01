@@ -41,3 +41,8 @@ Decision: Enforce a meta CSP with Astro's automatic hashes. Components must not 
 ## 2026-09-30 — Lighthouse CPU multiplier on slow local machines
 Context: The dev laptop (i7-6700HQ) scores `benchmarkIndex` ≈ 370. With the 4× multiplier in lighthouserc.json (calibrated for fast desktops and CI runners), a local run emulates a phone about 4× slower than the Moto G Power target. The first run showed LCP 3.4 s and TBT 416 ms on a page with no JS.
 Decision: CI keeps 4× (lighthouserc.json). Machines scoring below 800 run `npm run lhci:local` (1×), as Lighthouse's throttling guide recommends. Phase 6 result at 1× (median of 3): LCP 1.84 s, FCP 1.25 s, TBT 38 ms, CLS 0, 157 KB total transfer, score 0.99. Phase 12 confirms on WebPageTest (Moto G Power, 4G).
+
+## 2026-10-01 — Staging deploy on Vercel (client request)
+Context: The client asked for the page to go live on a new Vercel project. The docs plan Cloudflare Pages plus Pages Functions for `/api/lead` (docs/03).
+Decision: Deploy the static build to Vercel project `lennore-lp` as a **staging** site. `vercel.json` mirrors the security and cache headers from `public/_headers` and adds `X-Robots-Tag: noindex, nofollow` on every path until launch.
+Consequences: The lead form posts to `/api/lead`, which does not exist yet, so submissions fail until Phase 10. **Before Phase 10, decide whether hosting stays on Vercel (lead API as a Vercel Function, no Turnstile change needed) or moves to Cloudflare Pages as planned.** Remove the noindex header at launch (Phase 14).
